@@ -43,7 +43,8 @@ test_configuration() {
     trap 'docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true' EXIT
     
     set +e
-    DOCKER_START_OUTPUT=$(docker run -d --platform linux/amd64 --name "$CONTAINER_NAME" -v "$CWD/../src/:/var/www/html/extensions/m2-meta-security-patches" $CONTAINER_IMAGE 2>&1)
+    DOCKER_START_OUTPUT=$(docker run -d --platform linux/amd64 --name "$CONTAINER_NAME" -v "$CWD/../:/var/www/html/extensions/m2-meta-security-patches:ro" $CONTAINER_IMAGE 2>&1)
+
     if [ "$?" -ne 0 ]; then
         echo -e "⚠️ ${CLR_YELLOW}Failed to start container for configuration: Package=$PACKAGE, App Version=$APP_VERSION, PHP Version=$PHP_VERSION"
         if [ "$SUMMARY" = false ]; then
@@ -88,9 +89,9 @@ elif [ ${#POSITIONAL[@]} -ne 0 ]; then
 fi
 
 # Test Matrix should start at the newest versions and work its way down
-TEST_MATRIX_FILE="$CWD/test-matrix.json"
+TEST_MATRIX_FILE="$CWD/matrix.json"
 [ -f "$TEST_MATRIX_FILE" ] || {
-    echo "Test matrix file 'test-matrix.json' not found!"
+    echo "Test matrix file: $TEST_MATRIX_FILE not found!"
     exit 1
 }
 

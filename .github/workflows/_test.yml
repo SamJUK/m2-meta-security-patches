@@ -16,7 +16,7 @@ jobs:
         id: set-matrix
         run: |
           # Parse test-matrix.json and generate GitHub Actions matrix
-          MATRIX=$(cat tests/test-matrix.json | jq -c '[
+          MATRIX=$(cat tests/matrix.json | jq -c '[
             to_entries[] | 
             .value as $versions | 
             .key as $package | 
@@ -36,7 +36,7 @@ jobs:
       fail-fast: false
       matrix:
         include: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
-    name: Test ${{ matrix.magento_version }} (${{ matrix.php_version }})
+    name: Test ${{ matrix.package }}:${{ matrix.magento_version }}-${{ matrix.php_version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -47,7 +47,7 @@ jobs:
           
           docker run --rm \
             --name "m2-meta-security-patches-test-${{ matrix.magento_version }}-${{ matrix.php_version }}" \
-            -v "$(pwd)/src/:/var/www/html/extensions/m2-meta-security-patches" \
+            -v "$(pwd)/:/var/www/html/extensions/m2-meta-security-patches:ro" \
             $CONTAINER_IMAGE \
             sh -c "composer require samjuk/m2-meta-security-patches:@dev --no-interaction -W -vvv"
 

@@ -40,10 +40,14 @@ For detailed information on each patch, see the patches in [src/patches/emergenc
 To install the meta package, use Composer by running the following command in your Magento 2 root directory:
 
 ```bash
-composer require samjuk/m2-meta-security-patches
+composer require samjuk/m2-meta-security-patches:">=2026.02.01"
 ```
 
 The patches will be automatically applied during installation via [vaimo/composer-patches](https://github.com/vaimo/composer-patches).
+
+## Versioning
+
+The versioning of this meta package follows date based versioning to indicate the release date of the included patches. For example, a version `2024.10.15` indicates that the package was released on October 15, 2024.
 
 ## Development
 

@@ -1,8 +1,20 @@
 {
     "name": "samjuk/m2-meta-security-patches",
     "description": "Meta package to apply all the new isolated security and emergency patches for Magento 2",
+    "type": "library",
     "require": {
         "vaimo/composer-patches": ">5.0"
+    },
+    "keywords": [
+        "security",
+        "patches",
+        "cve",
+        "composer",
+        "magento2"
+    ],
+    "support": {
+        "issues": "https://github.com/SamJUK/m2-meta-security-patches/issues",
+        "security": "https://github.com/SamJUK/m2-meta-security-patches/security"
     },
     "extra": {
         "patches": {

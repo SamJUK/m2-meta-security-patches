@@ -64,7 +64,7 @@ Full E2E tests are run via GitHub Actions:
 - **On master/main commits**: Tests run automatically on every push
 - **On pull requests**: Add the `run-tests` label to trigger the test suite
 
-The test suite validates the package installation across multiple Magento versions and PHP versions (see [test-matrix.json](test-matrix.json) for the complete matrix).
+The test suite validates the package installation across multiple Magento versions and PHP versions (see [test-matrix.json](tests/test-matrix.json) for the complete matrix).
 
 ### Local Testing
 

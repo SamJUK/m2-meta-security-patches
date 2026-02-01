@@ -1,0 +1,70 @@
+name: Reusable Test Workflow
+
+on:
+  workflow_call:
+
+jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate test matrix
+        id: set-matrix
+        run: |
+          # Parse test-matrix.json and generate GitHub Actions matrix
+          MATRIX=$(cat test-matrix.json | jq -c '[
+            to_entries[] | 
+            .value as $versions | 
+            .key as $package | 
+            $versions | to_entries[] | 
+            {
+              package: $package,
+              magento_version: .key,
+              php_version: .value
+            }
+          ]')
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+
+  test:
+    needs: generate-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    name: Test ${{ matrix.magento_version }} (${{ matrix.php_version }})
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run test for ${{ matrix.magento_version }}
+        run: |
+          CONTAINER_IMAGE="${{ matrix.package }}:${{ matrix.magento_version }}-${{ matrix.php_version }}"
+          
+          docker run --rm \
+            --name "m2-meta-security-patches-test-${{ matrix.magento_version }}-${{ matrix.php_version }}" \
+            -v "$(pwd)/src/:/var/www/html/extensions/m2-meta-security-patches" \
+            $CONTAINER_IMAGE \
+            sh -c "composer require samjuk/m2-meta-security-patches:@dev --no-interaction -W -vvv"
+
+      - name: Output result
+        if: success()
+        run: echo "✅ Test succeeded for ${{ matrix.magento_version }} (${{ matrix.php_version }})"
+
+  test-summary:
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check test results
+        run: |
+          if [ "${{ needs.test.result }}" == "failure" ]; then
+            echo "❌ Some tests failed"
+            exit 1
+          else
+            echo "✅ All tests passed"
+          fi

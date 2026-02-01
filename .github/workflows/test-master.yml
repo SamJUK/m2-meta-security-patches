@@ -1,0 +1,11 @@
+name: Test on Master
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  run-tests:
+    uses: ./.github/workflows/_test.yml

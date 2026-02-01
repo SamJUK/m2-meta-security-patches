@@ -1,0 +1,73 @@
+name: Test on PR Label
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  check-authorization:
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'run-tests'
+    outputs:
+      authorized: ${{ steps.check-permission.outputs.authorized }}
+    steps:
+      - name: Check user permissions
+        id: check-permission
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const actor = context.actor;
+            
+            // Get user's permission level
+            const { data: permission } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: actor
+            });
+            
+            // Allow if user has admin or write permissions
+            const isAuthorized = ['admin', 'write'].includes(permission.permission);
+            
+            if (!isAuthorized) {
+              core.setFailed(`User ${actor} is not authorized to trigger tests. Only repository collaborators with write or admin access can trigger tests.`);
+              return false;
+            }
+            
+            core.setOutput('authorized', 'true');
+            return true;
+
+  check-label:
+    needs: check-authorization
+    runs-on: ubuntu-latest
+    if: needs.check-authorization.outputs.authorized == 'true'
+    outputs:
+      should-run: ${{ steps.check.outputs.result }}
+    steps:
+      - name: Check label
+        id: check
+        run: echo "result=true" >> $GITHUB_OUTPUT
+
+  run-tests:
+    needs: check-label
+    if: needs.check-label.outputs.should-run == 'true'
+    uses: ./.github/workflows/_test.yml
+
+  remove-label:
+    needs: [check-authorization, check-label, run-tests]
+    runs-on: ubuntu-latest
+    if: always() && needs.check-authorization.outputs.authorized == 'true'
+    steps:
+      - name: Remove run-tests label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: 'run-tests'
+              });
+            } catch (error) {
+              console.log('Label may have already been removed or does not exist');
+            }

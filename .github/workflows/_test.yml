@@ -16,7 +16,7 @@ jobs:
         id: set-matrix
         run: |
           # Parse test-matrix.json and generate GitHub Actions matrix
-          MATRIX=$(cat test-matrix.json | jq -c '[
+          MATRIX=$(cat tests/test-matrix.json | jq -c '[
             to_entries[] | 
             .value as $versions | 
             .key as $package | 

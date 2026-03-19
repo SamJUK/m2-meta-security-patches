@@ -32,6 +32,7 @@ These patches address critical vulnerabilities out of band security issues that 
 
 - **CVE-2024-34102** - CosmicSting vulnerability affecting Magento 2.4.7 and earlier
 - **CVE-2025-54236** - Session security vulnerability
+- **APSB25-94** - Polyshell vulnerability affecting Magento 2.4.9-alpha2 and earlier
 
 For detailed information on each patch, see the patches in [src/patches/emergency/](src/patches/emergency/).
 

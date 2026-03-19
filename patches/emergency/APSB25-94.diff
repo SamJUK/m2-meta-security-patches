@@ -1,0 +1,25 @@
+# Subset of the Adobe patch for the Polyshell vuln (APSB25-94)
+# https://www.samdjames.uk/blog/magento2-polyshell-vulnerability/
+# https://github.com/markshust/magento-polyshell-patch/
+--- a/vendor/magento/framework/Api/ImageProcessor.php
++++ b/vendor/magento/framework/Api/ImageProcessor.php
+@@ -135,6 +135,7 @@
+      */
+     public function processImageContent($entityType, $imageContent)
+     {
++        $this->uploader->setAllowedExtensions(['jpg', 'jpeg', 'gif', 'png']);
+         if (!$this->contentValidator->isValid($imageContent)) {
+             throw new InputException(new Phrase('The image content is invalid. Verify the content and try again.'));
+         }
+--- a/vendor/magento/framework/Api/ImageContentValidator.php
++++ b/vendor/magento/framework/Api/ImageContentValidator.php
+@@ -60,6 +60,9 @@
+         if ($sourceMimeType != $imageContent->getType() || !$this->isMimeTypeValid($sourceMimeType)) {
+             throw new InputException(new Phrase('The image MIME type is not valid or not supported.'));
+         }
++        if (in_array(pathinfo($imageContent->getName(), PATHINFO_EXTENSION), ['jpg', 'jpeg', 'gif', 'png']) === false) {
++            throw new InputException(new Phrase('The image file extension is not allowed.'));
++        }
+         if (!$this->isNameValid($imageContent->getName())) {
+             throw new InputException(new Phrase('Provided image name contains forbidden characters.'));
+         }

@@ -30,6 +30,12 @@
                     "depends": {
                         "magento/framework": "==103.0.7 | >=103.0.6 <=103.0.6-p5 || >=103.0.5 <=103.0.5-p7 || >=103.0.4 <=103.0.4-p8 || <103.0.4"
                     }
+                },
+                "APSB25-94 (Polyshell)": {
+                    "source": "patches/emergency/APSB25-94.diff",
+                    "depends": {
+                        "magento/framework": "< 103.0.9 || 103.0.9-alpha1 || 103.0.9-alpha2"
+                    }
                 }
             }
         }

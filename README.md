@@ -22,7 +22,9 @@ We break down the included security patches into a few groups:
 
 These are the new approach to regular security updates provided by Adobe.
 
-- TBA
+Isolated patches are **non-cumulative and must be applied in sequence**. Each monthly patch is built against, and will only apply to, the **latest patch release** of its line at the time it was issued (e.g. `2026-07-001` for the `2.4.8` line only applies to `2.4.8-p5`, not `p4` or earlier). If you're behind on patch levels, catch up first — the patch won't apply otherwise.
+
+- **2026-07-001 (CE)** - Adobe Commerce monthly isolated security release, July 2026. CE-only; EE/B2B variants not currently included in this package.
 
 For detailed information on each patch, see the patches in [src/patches/isolated/](src/patches/isolated/).
 

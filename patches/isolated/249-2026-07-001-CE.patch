@@ -1583,21 +1583,6 @@ index 9bea297684d6e..0efc37b769448 100644
                  </protected_extensions>
                  <public_files_valid_paths>
                      <protected>
-diff --git a/nginx.conf.sample b/nginx.conf.sample
-index be5cff37e8e61..9e19d1bc9c309 100644
---- a/nginx.conf.sample
-+++ b/nginx.conf.sample
-@@ -189,6 +189,10 @@ location /media/customer/ {
-     deny all;
- }
- 
-+location /media/customer_address/ {
-+    deny all;
-+}
-+
- location /media/downloadable/ {
-     deny all;
- }
 diff --git a/vendor/bin/patch-status b/vendor/bin/patch-status
 new file mode 100755
 index 0000000..cbd34a4

@@ -1,12 +1,14 @@
-# Magento 2 Meta Package: Security Patches
+# Magento 2 / Adobe Commerce Meta Package: Security Patches
 
 [![Test on Master](https://github.com/SamJUK/m2-meta-security-patches/actions/workflows/test-master.yml/badge.svg)](https://github.com/SamJUK/m2-meta-security-patches/actions/workflows/test-master.yml)
 
-This repository contains a meta package for applying security patches to Magento 2 installations. The package aggregates various security patches including Adobe's new isolated patches, and emergency out of band patches to ensure that your Magento 2 store remains secure against known vulnerabilities.
+This repository contains a Composer meta package for applying security patches to Magento 2 / Adobe Commerce installations. The package aggregates Adobe's isolated security patches and emergency out-of-band patches, protecting your store against known vulnerabilities and CVEs without manual patch hunting.
+
+> **Scope:** Community Edition (CE) only. EE/B2B is not currently supported — see [Isolated Security Patches](#isolated-security-patches) below.
 
 The primary reason for using a meta package is to simplify the management and application of multiple security patches. Instead of applying each patch individually to each project, you can install this meta package, which will automatically include all the necessary patches.
 
-Future updates can be handled automatically via Dependabot or Renovate, ensuring that your Magento 2 installation stays up-to-date with the latest security fixes without the manual overhead and cost.
+Future updates can be handled automatically via Dependabot or Renovate, ensuring that your Magento 2 / Adobe Commerce installation stays up-to-date with the latest security fixes without the manual overhead and cost.
 
 ## Requirements
 

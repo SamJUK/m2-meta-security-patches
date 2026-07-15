@@ -1,17 +1,30 @@
 {
     "name": "samjuk/m2-meta-security-patches",
-    "description": "Meta package to apply all the new isolated security and emergency patches for Magento 2",
+    "description": "Composer meta-package that applies critical and isolated security patches for Magento 2 / Adobe Commerce, released by Adobe",
     "type": "library",
+    "license": "MIT",
     "require": {
         "vaimo/composer-patches": ">5.0"
     },
     "keywords": [
         "security",
         "patches",
+        "security-patch",
         "cve",
+        "vulnerability",
         "composer",
-        "magento2"
+        "composer-plugin",
+        "magento",
+        "magento2",
+        "adobe-commerce"
     ],
+    "authors": [
+        {
+            "name": "Sam James",
+            "homepage": "https://www.samdjames.uk"
+        }
+    ],
+    "homepage": "https://www.samdjames.uk/blog/magento-isolated-patching-meta-package/",
     "support": {
         "issues": "https://github.com/SamJUK/m2-meta-security-patches/issues",
         "security": "https://github.com/SamJUK/m2-meta-security-patches/security"
@@ -30,7 +43,7 @@
                     "source": "patches/emergency/CVE-2024-34102.patch",
                     "cwd": "project",
                     "depends": {
-                        "magento/framework": "==103.0.7 | >=103.0.6 <=103.0.6-p5 || >=103.0.5 <=103.0.5-p7 || >=103.0.4 <=103.0.4-p8 || <103.0.4"
+                        "magento/framework": "==103.0.7 || >=103.0.6 <=103.0.6-p5 || >=103.0.5 <=103.0.5-p7 || >=103.0.4 <=103.0.4-p8 || <103.0.4"
                     }
                 },
                 "APSB25-94 (Polyshell)": {

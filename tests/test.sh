@@ -57,7 +57,7 @@ test_configuration() {
         echo -e "${CLR_RESET}"
     fi
 
-    TEST_OUTPUT=$(docker exec "$CONTAINER_NAME" sh -c "composer require samjuk/m2-meta-security-patches:@dev --no-interaction -W -vvv" 2>&1)
+    TEST_OUTPUT=$(docker exec "$CONTAINER_NAME" sh -c "composer require samjuk/m2-meta-security-patches:@dev --no-interaction -W -vvv && composer patch:list" 2>&1)
     if [ "$?" -ne 0 ]; then
         echo -e "❌ ${CLR_RED}Test failed for configuration: Package=$PACKAGE, App Version=$APP_VERSION, PHP Version=$PHP_VERSION${CLR_GREY}"
         if [ "$SUMMARY" = false ]; then

@@ -48,6 +48,28 @@ composer require samjuk/m2-meta-security-patches:">=2026.02.01"
 
 The patches will be automatically applied during installation via [vaimo/composer-patches](https://github.com/vaimo/composer-patches).
 
+### Restrict patch sources (recommended)
+
+By default, `vaimo/composer-patches` allows **any** dependency to declare patches, which is a supply chain risk — a compromised or malicious package could silently patch your codebase. Restrict patching to only this meta package:
+
+```bash
+composer config --json "extra.patcher" '{"sources":{"packages":["samjuk/m2-meta-security-patches"]}}'
+```
+
+This writes the following to your root `composer.json` (merge manually if `extra.patcher` already has other config, since the command above overwrites the whole key):
+
+```json
+{
+    "extra": {
+        "patcher": {
+            "sources": {
+                "packages": ["samjuk/m2-meta-security-patches"]
+            }
+        }
+    }
+}
+```
+
 ## Versioning
 
 The versioning of this meta package follows date based versioning to indicate the release date of the included patches. For example, a version `2024.10.15` indicates that the package was released on October 15, 2024.

@@ -41,6 +41,45 @@ These patches address critical vulnerabilities out of band security issues that 
 
 For detailed information on each patch, see the patches in [src/patches/emergency/](src/patches/emergency/).
 
+## Changes we make to Adobe's patches
+
+The patch files in this repo are not byte-identical to the ones Adobe ships. Two kinds of change are applied:
+
+### Hunks targeting project root files are repointed at their owning package
+
+Adobe's patches are written against a project root, so some hunks target files that sit at the root but are owned by a package that copies them into place on install. `magento/magento2-base` is the usual culprit (for example `nginx.conf.sample` and `lib/web/underscore.js`).
+
+These can't be patched at their root path. `vaimo/composer-patches` applies patches on `PRE_AUTOLOAD_DUMP`, but `magento/magento-composer-installer` deploys the root files on `POST_INSTALL_CMD`, which runs later. On a clean install (fresh checkout, no `vendor/`) those files don't exist yet when patching runs, so the patch fails and halts the run before the deploy that would have created them. Every subsequent `composer install` hits the same state.
+
+We repoint such hunks at the owning package path instead (`vendor/magento/magento2-base/...`). The file always exists at patch time, and the deploy afterwards copies the patched version to the project root. This works for both clean installs and adding the package to an existing install.
+
+### `vendor/bin/patch-status` is removed
+
+Adobe's patches add `vendor/bin/patch-status`, a version-reporting CLI rather than a security fix. It is added as a new file, so it only applies once: if the file is already there, re-applying fails with `vendor/bin/patch-status: already exists in working directory`, and that takes down `composer patch:redo` for every patch in the run, not just the one containing the hunk.
+
+Since it isn't a security fix and it blocks patches being re-applied, we strip it.
+
+## Known issue: patches silently revert
+
+Reinstalling or updating `magento/magento2-base` re-extracts the package and reverts the patched files. `composer patch:list` will still report the patches as `[APPLIED]` and `composer install` will report `Nothing to patch`, so nothing warns you.
+
+This is a bug in `vaimo/composer-patches`, not something specific to this package: it records applied state against the patch file and never re-checks the target. It affects ordinary single-package patches too. See [vaimo/composer-patches#162](https://github.com/vaimo/composer-patches/issues/162).
+
+To re-apply them:
+
+```bash
+composer patch:redo
+```
+
+Then confirm:
+
+```bash
+grep -m1 'Underscore.js 1.13' lib/web/underscore.js   # expect 1.13.8
+grep -c customer_address nginx.conf.sample            # expect 1
+```
+
+Don't wire this into a `post-install-cmd` script. `composer patch:redo` triggers the `post-install-cmd` causing an infinite loop. Run it manually after any operation that reinstalls `magento/magento2-base`.
+
 ## Installation
 
 To install the meta package, use Composer by running the following command in your Magento 2 root directory:
@@ -53,7 +92,7 @@ The patches will be automatically applied during installation via [vaimo/compose
 
 ### Restrict patch sources (recommended)
 
-By default, `vaimo/composer-patches` allows **any** dependency to declare patches, which is a supply chain risk — a compromised or malicious package could silently patch your codebase. Restrict patching to only this meta package:
+By default, `vaimo/composer-patches` allows **any** dependency to declare patches, which is a supply chain risk — a compromised or malicious package could silently patch your codebase. See [vaimo/composer-patches#157](https://github.com/vaimo/composer-patches/issues/157). Restrict patching to only this meta package:
 
 ```bash
 composer config --json "extra.patcher" '{"sources":{"packages":["samjuk/m2-meta-security-patches"]}}'

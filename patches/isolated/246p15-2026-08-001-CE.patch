@@ -1,0 +1,641 @@
+diff --git a/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/DeleteFiles.php b/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/DeleteFiles.php
+index e50a4e1b10076..c9916a4383d10 100644
+--- a/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/DeleteFiles.php
++++ b/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/DeleteFiles.php
+@@ -14,5 +14,12 @@
+ class DeleteFiles extends \Magento\Cms\Controller\Adminhtml\Wysiwyg\Images implements HttpPostActionInterface
+ {
++    /**
++     * Authorization for deleting files
++     *
++     * @see _isAllowed()
++     */
++    public const ADMIN_RESOURCE = 'Magento_MediaGalleryUiApi::delete_assets';
++
+     /**
+      * @var \Magento\Framework\Controller\Result\JsonFactory
+      */
+diff --git a/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/DeleteFolder.php b/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/DeleteFolder.php
+index f5f44eb4ed48a..bbcd71392b7a7 100644
+--- a/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/DeleteFolder.php
++++ b/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/DeleteFolder.php
+@@ -17,5 +17,12 @@
+ class DeleteFolder extends \Magento\Cms\Controller\Adminhtml\Wysiwyg\Images implements HttpPostActionInterface
+ {
++    /**
++     * Authorization for deleting folder
++     *
++     * @see _isAllowed()
++     */
++    public const ADMIN_RESOURCE = 'Magento_MediaGalleryUiApi::delete_folder';
++
+     /**
+      * @var \Magento\Framework\Controller\Result\JsonFactory
+      */
+diff --git a/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/NewFolder.php b/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/NewFolder.php
+index 1ef6231611124..5c8ac2a9a8351 100644
+--- a/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/NewFolder.php
++++ b/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/NewFolder.php
+@@ -15,5 +15,12 @@
+ class NewFolder extends \Magento\Cms\Controller\Adminhtml\Wysiwyg\Images implements HttpPostActionInterface
+ {
++    /**
++     * Authorization for creating folder
++     *
++     * @see _isAllowed()
++     */
++    public const ADMIN_RESOURCE = 'Magento_MediaGalleryUiApi::create_folder';
++
+     /**
+      * @var \Magento\Framework\Controller\Result\JsonFactory
+      */
+diff --git a/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/OnInsert.php b/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/OnInsert.php
+index c7b0752e52181..5ab5c5e22f8fe 100644
+--- a/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/OnInsert.php
++++ b/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/OnInsert.php
+@@ -15,6 +15,13 @@
+ 
+ class OnInsert extends Images implements HttpPostActionInterface
+ {
++    /**
++     * Authorization for inserting files
++     *
++     * @see _isAllowed()
++     */
++    public const ADMIN_RESOURCE = 'Magento_MediaGalleryUiApi::insert_assets';
++
+     /**
+      * @var RawFactory
+      */
+diff --git a/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/Upload.php b/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/Upload.php
+index aa1964152e0c3..c28a2248dae42 100644
+--- a/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/Upload.php
++++ b/vendor/magento/module-cms/Controller/Adminhtml/Wysiwyg/Images/Upload.php
+@@ -18,5 +18,12 @@
+ class Upload extends \Magento\Cms\Controller\Adminhtml\Wysiwyg\Images implements HttpPostActionInterface
+ {
++    /**
++     * Authorization for uploading files
++     *
++     * @see _isAllowed()
++     */
++    public const ADMIN_RESOURCE = 'Magento_MediaGalleryUiApi::upload_assets';
++
+     /**
+      * @var \Magento\Framework\Controller\Result\JsonFactory
+      */
+diff --git a/vendor/magento/module-cms/etc/module.xml b/vendor/magento/module-cms/etc/module.xml
+index d3fc2846217d9..50953d37fe93e 100644
+--- a/vendor/magento/module-cms/etc/module.xml
++++ b/vendor/magento/module-cms/etc/module.xml
+@@ -11,6 +11,7 @@
+             <module name="Magento_Store"/>
+             <module name="Magento_Theme"/>
+             <module name="Magento_Variable"/>
++            <module name="Magento_MediaGalleryUiApi"/>
+         </sequence>
+     </module>
+ </config>
+diff --git a/vendor/magento/module-review/Controller/Adminhtml/Product/Save.php b/vendor/magento/module-review/Controller/Adminhtml/Product/Save.php
+index a7a0c96b7e48f..8c36f33eac47d 100644
+--- a/vendor/magento/module-review/Controller/Adminhtml/Product/Save.php
++++ b/vendor/magento/module-review/Controller/Adminhtml/Product/Save.php
+@@ -37,6 +37,7 @@ public function execute()
+                 $this->messageManager->addErrorMessage(__('The review was removed by another user or does not exist.'));
+             } else {
+                 try {
++                    unset($data['review_id']);
+                     $review->addData($data)->save();
+ 
+                     $arrRatingId = $this->getRequest()->getParam('ratings', []);
+diff --git a/lib/web/underscore.js b/lib/web/underscore.js
+index 3f53992b9fa26..01ff20f6371bd 100644
+--- a/lib/web/underscore.js
++++ b/lib/web/underscore.js
+@@ -7,19 +7,19 @@
+                 exports.noConflict = function () { global._ = current; return exports; };
+             }()));
+ }(this, (function () {
+-    //     Underscore.js 1.13.2
++    //     Underscore.js 1.13.8
+     //     https://underscorejs.org
+-    //     (c) 2009-2021 Jeremy Ashkenas, Julian Gonggrijp, and DocumentCloud and Investigative Reporters & Editors
++    //     (c) 2009-2026 Jeremy Ashkenas, Julian Gonggrijp, and DocumentCloud and Investigative Reporters & Editors
+     //     Underscore may be freely distributed under the MIT license.
+ 
+     // Current version.
+-    var VERSION = '1.13.2';
++    var VERSION = '1.13.8';
+ 
+     // Establish the root object, `window` (`self`) in the browser, `global`
+     // on the server, or `this` in some virtual machines. We use `self`
+     // instead of `window` for `WebWorker` support.
+-    var root = typeof self == 'object' && self.self === self && self ||
+-        typeof global == 'object' && global.global === global && global ||
++    var root = (typeof self == 'object' && self.self === self && self) ||
++        (typeof global == 'object' && global.global === global && global) ||
+         Function('return this')() ||
+         {};
+ 
+@@ -87,7 +87,7 @@
+     // Is a given variable an object?
+     function isObject(obj) {
+         var type = typeof obj;
+-        return type === 'function' || type === 'object' && !!obj;
++        return type === 'function' || (type === 'object' && !!obj);
+     }
+ 
+     // Is a given value equal to null?
+@@ -150,8 +150,11 @@
+     // In IE 10 - Edge 13, `DataView` has string tag `'[object Object]'`.
+     // In IE 11, the most common among them, this problem also applies to
+     // `Map`, `WeakMap` and `Set`.
+-    var hasStringTagBug = (
+-            supportsDataView && hasObjectTag(new DataView(new ArrayBuffer(8)))
++    // Also, there are cases where an application can override the native
++    // `DataView` object, in cases like that we can't use the constructor
++    // safely and should just rely on alternate `DataView` checks
++    var hasDataViewBug = (
++            supportsDataView && (!/\[native code\]/.test(String(DataView)) || hasObjectTag(new DataView(new ArrayBuffer(8))))
+         ),
+         isIE11 = (typeof Map !== 'undefined' && hasObjectTag(new Map));
+ 
+@@ -159,11 +162,13 @@
+ 
+     // In IE 10 - Edge 13, we need a different heuristic
+     // to determine whether an object is a `DataView`.
+-    function ie10IsDataView(obj) {
++    // Also, in cases where the native `DataView` is
++    // overridden we can't rely on the tag itself.
++    function alternateIsDataView(obj) {
+         return obj != null && isFunction$1(obj.getInt8) && isArrayBuffer(obj.buffer);
+     }
+ 
+-    var isDataView$1 = (hasStringTagBug ? ie10IsDataView : isDataView);
++    var isDataView$1 = (hasDataViewBug ? alternateIsDataView : isDataView);
+ 
+     // Is a given value an array?
+     // Delegates to ECMA5's native `Array.isArray`.
+@@ -264,7 +269,7 @@
+         keys = emulatedSet(keys);
+         var nonEnumIdx = nonEnumerableProps.length;
+         var constructor = obj.constructor;
+-        var proto = isFunction$1(constructor) && constructor.prototype || ObjProto;
++        var proto = (isFunction$1(constructor) && constructor.prototype) || ObjProto;
+ 
+         // Constructor is a special case.
+         var prop = 'constructor';
+@@ -352,131 +357,157 @@
+     // We use this string twice, so give it a name for minification.
+     var tagDataView = '[object DataView]';
+ 
+-    // Internal recursive comparison function for `_.isEqual`.
+-    function eq(a, b, aStack, bStack) {
+-        // Identical objects are equal. `0 === -0`, but they aren't identical.
+-        // See the [Harmony `egal` proposal](https://wiki.ecmascript.org/doku.php?id=harmony:egal).
+-        if (a === b) return a !== 0 || 1 / a === 1 / b;
+-        // `null` or `undefined` only equal to itself (strict comparison).
+-        if (a == null || b == null) return false;
+-        // `NaN`s are equivalent, but non-reflexive.
+-        if (a !== a) return b !== b;
+-        // Exhaust primitive checks
+-        var type = typeof a;
+-        if (type !== 'function' && type !== 'object' && typeof b != 'object') return false;
+-        return deepEq(a, b, aStack, bStack);
+-    }
+-
+-    // Internal recursive comparison function for `_.isEqual`.
+-    function deepEq(a, b, aStack, bStack) {
+-        // Unwrap any wrapped objects.
+-        if (a instanceof _$1) a = a._wrapped;
+-        if (b instanceof _$1) b = b._wrapped;
+-        // Compare `[[Class]]` names.
+-        var className = toString.call(a);
+-        if (className !== toString.call(b)) return false;
+-        // Work around a bug in IE 10 - Edge 13.
+-        if (hasStringTagBug && className == '[object Object]' && isDataView$1(a)) {
+-            if (!isDataView$1(b)) return false;
+-            className = tagDataView;
+-        }
+-        switch (className) {
+-            // These types are compared by value.
+-            case '[object RegExp]':
+-            // RegExps are coerced to strings for comparison (Note: '' + /a/i === '/a/i')
+-            case '[object String]':
+-                // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
+-                // equivalent to `new String("5")`.
+-                return '' + a === '' + b;
+-            case '[object Number]':
+-                // `NaN`s are equivalent, but non-reflexive.
+-                // Object(NaN) is equivalent to NaN.
+-                if (+a !== +a) return +b !== +b;
+-                // An `egal` comparison is performed for other numeric values.
+-                return +a === 0 ? 1 / +a === 1 / b : +a === +b;
+-            case '[object Date]':
+-            case '[object Boolean]':
+-                // Coerce dates and booleans to numeric primitive values. Dates are compared by their
+-                // millisecond representations. Note that invalid dates with millisecond representations
+-                // of `NaN` are not equivalent.
+-                return +a === +b;
+-            case '[object Symbol]':
+-                return SymbolProto.valueOf.call(a) === SymbolProto.valueOf.call(b);
+-            case '[object ArrayBuffer]':
+-            case tagDataView:
+-                // Coerce to typed array so we can fall through.
+-                return deepEq(toBufferView(a), toBufferView(b), aStack, bStack);
+-        }
++    // Perform a deep comparison to check if two objects are equal.
++    function isEqual(a, b) {
++        // Keep track of which pairs of values need to be compared. We will be
++        // trampolining on this stack instead of using function recursion.
++        // (CVE-2026-27601)
++        var todo = [{a: a, b: b}];
++        // Initializing stacks of traversed objects for cycle detection.
++        var aStack = [], bStack = [];
++
++        // Keep traversing pairs until there is nothing left to compare.
++        while (todo.length) {
++            var frame = todo.pop();
++            // As a special case, a single `true` on the todo means that we can
++            // unwind the cycle detection stacks.
++            if (frame === true) {
++                // Remove the first object from the stack of traversed objects.
++                aStack.pop();
++                bStack.pop();
++                continue;
++            }
++            a = frame.a;
++            b = frame.b;
+ 
+-        var areArrays = className === '[object Array]';
+-        if (!areArrays && isTypedArray$1(a)) {
+-            var byteLength = getByteLength(a);
+-            if (byteLength !== getByteLength(b)) return false;
+-            if (a.buffer === b.buffer && a.byteOffset === b.byteOffset) return true;
+-            areArrays = true;
+-        }
+-        if (!areArrays) {
+-            if (typeof a != 'object' || typeof b != 'object') return false;
+-
+-            // Objects with different constructors are not equivalent, but `Object`s or `Array`s
+-            // from different frames are.
+-            var aCtor = a.constructor, bCtor = b.constructor;
+-            if (aCtor !== bCtor && !(isFunction$1(aCtor) && aCtor instanceof aCtor &&
+-                isFunction$1(bCtor) && bCtor instanceof bCtor)
+-                && ('constructor' in a && 'constructor' in b)) {
++            // Identical objects are equal. `0 === -0`, but they aren't identical.
++            // See the [Harmony `egal` proposal](https://wiki.ecmascript.org/doku.php?id=harmony:egal).
++            if (a === b) {
++                if (a !== 0 || 1 / a === 1 / b) continue;
+                 return false;
+             }
+-        }
+-        // Assume equality for cyclic structures. The algorithm for detecting cyclic
+-        // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
+-
+-        // Initializing stack of traversed objects.
+-        // It's done here since we only need them for objects and arrays comparison.
+-        aStack = aStack || [];
+-        bStack = bStack || [];
+-        var length = aStack.length;
+-        while (length--) {
+-            // Linear search. Performance is inversely proportional to the number of
+-            // unique nested structures.
+-            if (aStack[length] === a) return bStack[length] === b;
+-        }
++            // `null` or `undefined` only equal to itself (strict comparison).
++            if (a == null || b == null) return false;
++            // `NaN`s are equivalent, but non-reflexive.
++            if (a !== a) {
++                if (b !== b) continue;
++                return false;
++            }
++            // Exhaust primitive checks
++            var type = typeof a;
++            if (type !== 'function' && type !== 'object' && typeof b != 'object') return false;
++
++            // Internal recursive comparison function for `_.isEqual`.
++            // Unwrap any wrapped objects.
++            if (a instanceof _$1) a = a._wrapped;
++            if (b instanceof _$1) b = b._wrapped;
++            // Compare `[[Class]]` names.
++            var className = toString.call(a);
++            if (className !== toString.call(b)) return false;
++            // Work around a bug in IE 10 - Edge 13.
++            if (hasDataViewBug && className == '[object Object]' && isDataView$1(a)) {
++                if (!isDataView$1(b)) return false;
++                className = tagDataView;
++            }
++            switch (className) {
++                // These types are compared by value.
++                case '[object RegExp]':
++                // RegExps are coerced to strings for comparison (Note: '' + /a/i === '/a/i')
++                case '[object String]':
++                    // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
++                    // equivalent to `new String("5")`.
++                    if ('' + a === '' + b) continue;
++                    return false;
++                case '[object Number]':
++                    todo.push({a: +a, b: +b});
++                    continue;
++                case '[object Date]':
++                case '[object Boolean]':
++                    // Coerce dates and booleans to numeric primitive values. Dates are compared by their
++                    // millisecond representations. Note that invalid dates with millisecond representations
++                    // of `NaN` are not equivalent.
++                    if (+a === +b) continue;
++                    return false;
++                case '[object Symbol]':
++                    if (SymbolProto.valueOf.call(a) === SymbolProto.valueOf.call(b)) continue;
++                    return false;
++                case '[object ArrayBuffer]':
++                case tagDataView:
++                    // Coerce to typed array so we can fall through.
++                    todo.push({a: toBufferView(a), b: toBufferView(b)});
++                    continue;
++            }
++
++            var areArrays = className === '[object Array]';
++            if (!areArrays && isTypedArray$1(a)) {
++                var byteLength = getByteLength(a);
++                if (byteLength !== getByteLength(b)) return false;
++                if (a.buffer === b.buffer && a.byteOffset === b.byteOffset) continue;
++                areArrays = true;
++            }
++            if (!areArrays) {
++                if (typeof a != 'object' || typeof b != 'object') return false;
++
++                // Objects with different constructors are not equivalent, but `Object`s or `Array`s
++                // from different frames are.
++                var aCtor = a.constructor, bCtor = b.constructor;
++                if (aCtor !== bCtor && !(isFunction$1(aCtor) && aCtor instanceof aCtor &&
++                        isFunction$1(bCtor) && bCtor instanceof bCtor)
++                    && ('constructor' in a && 'constructor' in b)) {
++                    return false;
++                }
++            }
+ 
+-        // Add the first object to the stack of traversed objects.
+-        aStack.push(a);
+-        bStack.push(b);
++            // Assume equality for cyclic structures. The algorithm for detecting cyclic
++            // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
+ 
+-        // Recursively compare objects and arrays.
+-        if (areArrays) {
+-            // Compare array lengths to determine if a deep comparison is necessary.
+-            length = a.length;
+-            if (length !== b.length) return false;
+-            // Deep compare the contents, ignoring non-numeric properties.
++            var length = aStack.length;
+             while (length--) {
+-                if (!eq(a[length], b[length], aStack, bStack)) return false;
++                // Linear search. Performance is inversely proportional to the number of
++                // unique nested structures.
++                if (aStack[length] === a) {
++                    // Cycle detected. Break out of the inner loop and continue the outer
++                    // loop. Step 1:
++                    if (bStack[length] === b) break;
++                    return false;
++                }
+             }
+-        } else {
+-            // Deep compare objects.
+-            var _keys = keys(a), key;
+-            length = _keys.length;
+-            // Ensure that both objects contain the same number of properties before comparing deep equality.
+-            if (keys(b).length !== length) return false;
+-            while (length--) {
+-                // Deep compare each member
+-                key = _keys[length];
+-                if (!(has$1(b, key) && eq(a[key], b[key], aStack, bStack))) return false;
++            // Step 2, use `length` to verify whether we detected a cycle:
++            if (length >= 0) continue;
++
++            // Add the first object to the stack of traversed objects.
++            aStack.push(a);
++            bStack.push(b);
++            // Remember to remove them again after the recursion below.
++            todo.push(true);
++
++            // Recursively compare objects and arrays.
++            if (areArrays) {
++                // Compare array lengths to determine if a deep comparison is necessary.
++                length = a.length;
++                if (length !== b.length) return false;
++                // Deep compare the contents, ignoring non-numeric properties.
++                while (length--) {
++                    todo.push({a: a[length], b: b[length]});
++                }
++            } else {
++                // Deep compare objects.
++                var _keys = keys(a), key;
++                length = _keys.length;
++                // Ensure that both objects contain the same number of properties before comparing deep equality.
++                if (keys(b).length !== length) return false;
++                while (length--) {
++                    // Deep compare each member
++                    key = _keys[length];
++                    if (!has$1(b, key)) return false;
++                    todo.push({a: a[key], b: b[key]});
++                }
+             }
+         }
+-        // Remove the first object from the stack of traversed objects.
+-        aStack.pop();
+-        bStack.pop();
++        // We made it to the end and found no differences.
+         return true;
+     }
+ 
+-    // Perform a deep comparison to check if two objects are equal.
+-    function isEqual(a, b) {
+-        return eq(a, b);
+-    }
+-
+     // Retrieve all the enumerable property names of an object.
+     function allKeys(obj) {
+         if (!isObject(obj)) return [];
+@@ -1027,25 +1058,30 @@
+     var isArrayLike = createSizePropertyCheck(getLength);
+ 
+     // Internal implementation of a recursive `flatten` function.
+-    function flatten$1(input, depth, strict, output) {
+-        output = output || [];
+-        if (!depth && depth !== 0) {
+-            depth = Infinity;
+-        } else if (depth <= 0) {
+-            return output.concat(input);
+-        }
+-        var idx = output.length;
+-        for (var i = 0, length = getLength(input); i < length; i++) {
+-            var value = input[i];
+-            if (isArrayLike(value) && (isArray(value) || isArguments$1(value))) {
++    function flatten$1(input, depth, strict) {
++        if (!depth && depth !== 0) depth = Infinity;
++        // We will be avoiding recursive calls because this could be exploited to
++        // cause a stack overflow (CVE-2026-27601). Instead, we "trampoline" on an
++        // explicit stack.
++        var output = [], idx = 0, i = 0, length = getLength(input) || 0, stack = [];
++        while (true) {
++            if (i >= length) {
++                if (!stack.length) break;
++                var frame = stack.pop();
++                i = frame.i;
++                input = frame.v;
++                length = getLength(input);
++                continue;
++            }
++            var value = input[i++];
++            if (stack.length >= depth) {
++                output[idx++] = value;
++            } else if (isArrayLike(value) && (isArray(value) || isArguments$1(value))) {
+                 // Flatten current level of array or arguments object.
+-                if (depth > 1) {
+-                    flatten$1(value, depth - 1, strict, output);
+-                    idx = output.length;
+-                } else {
+-                    var j = 0, len = value.length;
+-                    while (j < len) output[idx++] = value[j++];
+-                }
++                stack.push({i: i, v: input});
++                i = 0;
++                input = value;
++                length = getLength(input);
+             } else if (!strict) {
+                 output[idx++] = value;
+             }
+@@ -1467,7 +1503,7 @@
+     function max(obj, iteratee, context) {
+         var result = -Infinity, lastComputed = -Infinity,
+             value, computed;
+-        if (iteratee == null || typeof iteratee == 'number' && typeof obj[0] != 'object' && obj != null) {
++        if (iteratee == null || (typeof iteratee == 'number' && typeof obj[0] != 'object' && obj != null)) {
+             obj = isArrayLike(obj) ? obj : values(obj);
+             for (var i = 0, length = obj.length; i < length; i++) {
+                 value = obj[i];
+@@ -1479,7 +1515,7 @@
+             iteratee = cb(iteratee, context);
+             each(obj, function(v, index, list) {
+                 computed = iteratee(v, index, list);
+-                if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
++                if (computed > lastComputed || (computed === -Infinity && result === -Infinity)) {
+                     result = v;
+                     lastComputed = computed;
+                 }
+@@ -1492,7 +1528,7 @@
+     function min(obj, iteratee, context) {
+         var result = Infinity, lastComputed = Infinity,
+             value, computed;
+-        if (iteratee == null || typeof iteratee == 'number' && typeof obj[0] != 'object' && obj != null) {
++        if (iteratee == null || (typeof iteratee == 'number' && typeof obj[0] != 'object' && obj != null)) {
+             obj = isArrayLike(obj) ? obj : values(obj);
+             for (var i = 0, length = obj.length; i < length; i++) {
+                 value = obj[i];
+@@ -1504,7 +1540,7 @@
+             iteratee = cb(iteratee, context);
+             each(obj, function(v, index, list) {
+                 computed = iteratee(v, index, list);
+-                if (computed < lastComputed || computed === Infinity && result === Infinity) {
++                if (computed < lastComputed || (computed === Infinity && result === Infinity)) {
+                     result = v;
+                     lastComputed = computed;
+                 }
+@@ -1772,7 +1808,7 @@
+     // Complement of zip. Unzip accepts an array of arrays and groups
+     // each array's elements on shared indices.
+     function unzip(array) {
+-        var length = array && max(array, getLength).length || 0;
++        var length = (array && max(array, getLength).length) || 0;
+         var result = Array(length);
+ 
+         for (var index = 0; index < length; index++) {
+@@ -2039,3 +2075,4 @@
+     return _;
+ 
+ })));
++//# sourceMappingURL=underscore-umd.js.map
+diff --git a/vendor/magento/module-customer/Controller/Account/Edit.php b/vendor/magento/module-customer/Controller/Account/Edit.php
+index 2bd4862e42390..3e8a3ba3ae4d5 100644
+--- a/vendor/magento/module-customer/Controller/Account/Edit.php
++++ b/vendor/magento/module-customer/Controller/Account/Edit.php
+@@ -5,11 +5,14 @@
+  */
+ namespace Magento\Customer\Controller\Account;
+ 
++use Magento\Customer\Api\CustomerMetadataInterface;
+ use Magento\Customer\Api\CustomerRepositoryInterface;
++use Magento\Customer\Model\Metadata\FormFactory;
+ use Magento\Customer\Model\Session;
+ use Magento\Framework\Api\DataObjectHelper;
+ use Magento\Framework\App\Action\Context;
+ use Magento\Framework\App\Action\HttpGetActionInterface;
++use Magento\Framework\App\ObjectManager;
+ use Magento\Framework\View\Result\PageFactory;
+ 
+ class Edit extends \Magento\Customer\Controller\AbstractAccount implements HttpGetActionInterface
+@@ -34,24 +37,32 @@ class Edit extends \Magento\Customer\Controller\AbstractAccount implements HttpG
+      */
+     protected $resultPageFactory;
+ 
++    /**
++     * @var FormFactory
++     */
++    private $formFactory;
++
+     /**
+      * @param Context $context
+      * @param Session $customerSession
+      * @param PageFactory $resultPageFactory
+      * @param CustomerRepositoryInterface $customerRepository
+      * @param DataObjectHelper $dataObjectHelper
++     * @param FormFactory|null $formFactory
+      */
+     public function __construct(
+         Context $context,
+         Session $customerSession,
+         PageFactory $resultPageFactory,
+         CustomerRepositoryInterface $customerRepository,
+-        DataObjectHelper $dataObjectHelper
++        DataObjectHelper $dataObjectHelper,
++        ?FormFactory $formFactory = null
+     ) {
+         $this->session = $customerSession;
+         $this->resultPageFactory = $resultPageFactory;
+         $this->customerRepository = $customerRepository;
+         $this->dataObjectHelper = $dataObjectHelper;
++        $this->formFactory = $formFactory ?: ObjectManager::getInstance()->get(FormFactory::class);
+         parent::__construct($context);
+     }
+ 
+@@ -74,11 +85,19 @@ public function execute()
+         $customerId = $this->session->getCustomerId();
+         $customerDataObject = $this->customerRepository->getById($customerId);
+         if (!empty($data)) {
++            $customerForm = $this->formFactory->create(
++                CustomerMetadataInterface::ENTITY_TYPE_CUSTOMER,
++                EditPost::FORM_DATA_EXTRACTOR_CODE
++            );
++            $data = array_intersect_key($data, $customerForm->getAllowedAttributes());
++
+             $this->dataObjectHelper->populateWithArray(
+                 $customerDataObject,
+                 $data,
+                 \Magento\Customer\Api\Data\CustomerInterface::class
+             );
++
++            $customerDataObject->setId($customerId);
+         }
+ 
+         $this->session->setCustomerData($customerDataObject);
+diff --git a/vendor/bin/patch-status b/vendor/bin/patch-status
+index cbd34a4..a160fdd 100755
+--- a/vendor/bin/patch-status
++++ b/vendor/bin/patch-status
+@@ -1,3 +1,3 @@
+-#!/usr/bin/env php
+-<?php declare(strict_types=1);/* Adobe Commerce Monthly Security Release Versioning Tool — single-file build. Auto-generated by scripts/build.php. Requires PHP 8.1+. */namespace Magento\PatchStatus\Model;final class PatchStatus{public function __construct(public readonly string $baseVersion,public readonly array $appliedPatches,public readonly array $missingPatches,public readonly array $installedComponents,public readonly array $vulnerabilityStatus,public readonly array $warnings=[],public readonly string $registrySource='none',public readonly array $unknownPatches=[],){}public static function fromArray(array $data):self{return new self(baseVersion:$data['base_version']??'unknown',appliedPatches:$data['applied_patches']??[],missingPatches:$data['missing_patches']??[],vulnerabilityStatus:$data['vulnerability_status']??[],installedComponents:$data['installed_components']??[],warnings:$data['warnings']??[],registrySource:$data['registry_source']??'none',unknownPatches:$data['unknown_patches']??[],);}public function toArray():array{return['base_version'=>$this->baseVersion,'installed_components'=>$this->installedComponents,'applied_patches'=>$this->appliedPatches,'missing_patches'=>$this->missingPatches,'unknown_patches'=>$this->unknownPatches,'vulnerability_status'=>$this->vulnerabilityStatus,'registry_source'=>$this->registrySource,'warnings'=>$this->warnings,];}}namespace Magento\PatchStatus\Util;class UrlValidator{public static function isValid(string $url):bool{if(filter_var($url,FILTER_VALIDATE_URL)===false){return false;}$scheme=parse_url($url,PHP_URL_SCHEME);return is_string($scheme)&&strtolower($scheme)==='https';}}namespace Magento\PatchStatus\Credential;class ComposerCredentialResolver{public function resolve(string $magentoRoot,string $host):?array{$creds=$this->readComposerAuthEnv($host);if($creds!==null){return $creds;}$paths=array_merge([rtrim($magentoRoot,'/').'/auth.json'],$this->globalAuthJsonPaths(),);foreach($paths as $path){$creds=$this->readCredentials($path,$host);if($creds!==null){return $creds;}}$creds=$this->promptCredentials($host);if($creds!==null){$this->offerToSaveCredentials($magentoRoot,$creds,$host);return $creds;}return null;}protected function globalAuthJsonPaths():array{$composerHome=getenv('COMPOSER_HOME');if($composerHome!==false&&$composerHome!==''){return[rtrim($composerHome,'/').'/auth.json'];}$home=getenv('HOME');if($home!==false&&$home!==''){return[rtrim($home,'/').'/.composer/auth.json'];}return[];}protected function promptCredentials(string $host):?array{$isTty=function_exists('stream_isatty')?stream_isatty(STDIN):(function_exists('posix_isatty')?posix_isatty(STDIN):false);if(!$isTty){return null;}fwrite(STDERR,"\n{$host} credentials required.\n");fwrite(STDERR,'Username (Composer public key): ');$username=trim((string)fgets(STDIN));fwrite(STDERR,'Password (Composer private key): ');$canHideInput=function_exists('shell_exec');if($canHideInput){shell_exec('stty -echo');}try{$password=trim((string)fgets(STDIN));}finally{if($canHideInput){shell_exec('stty echo');}}fwrite(STDERR,"\n");if($username===''||$password===''){return null;}return['username'=>$username,'password'=>$password];}protected function offerToSaveCredentials(string $magentoRoot,array $credentials,string $host):void{$isTty=function_exists('stream_isatty')?stream_isatty(STDIN):(function_exists('posix_isatty')?posix_isatty(STDIN):false);if(!$isTty){return;}$authJsonPath=rtrim($magentoRoot,'/').'/auth.json';$action=file_exists($authJsonPath)?'Update':'Create';fwrite(STDERR,"{$action} {$authJsonPath} with these credentials? [Y/n]: ");$rawResponse=fgets(STDIN);if($rawResponse===false){return;}$response=strtolower(trim($rawResponse));if($response!=='n'&&$response!=='no'){$this->saveCredentialsToAuthJson($authJsonPath,$credentials,$host);}}protected function saveCredentialsToAuthJson(string $path,array $credentials,string $host):void{$data=[];if(file_exists($path)){$existing=@file_get_contents($path);if($existing!==false){$decoded=json_decode($existing,true);if(is_array($decoded)){$data=$decoded;}}}if(!is_array($data['http-basic']??null)){$data['http-basic']=[];}$data['http-basic'][$host]=['username'=>$credentials['username'],'password'=>$credentials['password'],];$encoded=json_encode($data,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);if($encoded===false){return;}$prevUmask=umask(0177);$written=false;try{$written=@file_put_contents($path,$encoded."\n",LOCK_EX)!==false;}finally{umask($prevUmask);}if($written){@chmod($path,0600);}}private function readComposerAuthEnv(string $host):?array{$raw=getenv('COMPOSER_AUTH');if($raw===false||$raw===''){return null;}$data=json_decode($raw,true);if(!is_array($data)){return null;}return $this->extractCredentials($data,$host);}private function readCredentials(string $path,string $host):?array{if(!file_exists($path)){return null;}$content=@file_get_contents($path);if($content===false){return null;}$data=json_decode($content,true);if(!is_array($data)){return null;}return $this->extractCredentials($data,$host);}private function extractCredentials(array $data,string $host):?array{if(!is_array($data['http-basic']??null)){return null;}$username=$data['http-basic'][$host]['username']??null;$password=$data['http-basic'][$host]['password']??null;if(!is_string($username)||$username===''||!is_string($password)||$password===''){return null;}return['username'=>$username,'password'=>$password];}}namespace Magento\PatchStatus\Fetcher;class PatchFetcher{public const DIFF_BASE_URL='https://repo.magento.com/patch';private const CACHE_DIR='var/patch_metadata/.patch_diffs';private const TIMEOUT=3;protected int $lastHttpStatus=0;public function __construct(private readonly string $magentoRoot,private readonly string $patchBaseUrl,private readonly?array $credentials=null,private readonly bool $noCache=false,){}public function hasCredentials():bool{return($this->credentials['username']??'')!==''&&($this->credentials['password']??'')!=='';}public function fetch(string $patchId,string $patchFile,string $expectedSha256,bool $authRequired=false,array&$warnings=[],):?string{if(!$this->isSafePatchFileName($patchFile)){return null;}$cachePath=rtrim($this->magentoRoot,'/').'/'.self::CACHE_DIR.'/'.$patchFile;if(!$this->noCache&&file_exists($cachePath)){$content=@file_get_contents($cachePath);if($content!==false&&$this->verifySha256($content,$expectedSha256)){return $content;}@unlink($cachePath);}if($authRequired&&!$this->hasCredentials()){$warnings[]="Patch {$patchId} requires authentication. Set credentials via COMPOSER_AUTH or auth.json.";return null;}$base=rtrim($this->patchBaseUrl,'/');$url=$authRequired?"{$base}/auth/{$patchFile}":"{$base}/{$patchFile}";$creds=$authRequired?$this->credentials:null;$content=$this->fetchRemote($url,$creds);if($content===false){$status=$this->lastHttpStatus;if($status>=400){$suffix=$authRequired?" Check credentials (COMPOSER_AUTH / auth.json).":"";$warnings[]="Could not fetch patch {$patchId} (HTTP {$status}).{$suffix}";}elseif($authRequired){$warnings[]="Could not fetch or verify patch {$patchId}. Check network connectivity and credentials (COMPOSER_AUTH / auth.json).";}else{$warnings[]="Could not fetch patch file for {$patchId}.";}return null;}if(!$this->verifySha256($content,$expectedSha256)){$warnings[]="SHA-256 verification failed for patch {$patchId}; discarding download.";return null;}$this->writeCache($cachePath,$content);return $content;}protected function fetchRemote(string $url,?array $credentials=null):string|false{$headers=[];if(($credentials['username']??'')!==''&&($credentials['password']??'')!==''){$encoded=base64_encode($credentials['username'].':'.$credentials['password']);$headers[]='Authorization: Basic '.$encoded;}$context=stream_context_create(['http'=>['timeout'=>self::TIMEOUT,'ignore_errors'=>true,'user_agent'=>'Adobe-Commerce-PatchStatus/'.\Magento\PatchStatus\PatchStatusCommand::VERSION,'header'=>implode("\r\n",$headers),],'ssl'=>['verify_peer'=>true,'verify_peer_name'=>true,],]);$this->lastHttpStatus=0;$content=@file_get_contents($url,context:$context);if($content!==false){$status=$this->parseResponseStatus($http_response_header??[]);$this->lastHttpStatus=$status;if($status>=400){return false;}}return $content;}private function parseResponseStatus(array $responseHeaders):int{$status=0;foreach($responseHeaders as $header){if(preg_match('#^HTTP/\S+ (\d{3})#',$header,$m)){$status=(int)$m[1];}}return $status;}private function verifySha256(string $content,string $expectedSha256):bool{return hash('sha256',$content)===strtolower($expectedSha256);}private function writeCache(string $path,string $content):void{$dir=dirname($path);if(!is_dir($dir)){@mkdir($dir,0775,true);}@file_put_contents($path,$content,LOCK_EX);}private function isSafePatchFileName(string $name):bool{return(bool)preg_match('/\A[A-Za-z0-9][A-Za-z0-9_\-]*\.(?:patch|diff)\z/',$name)&&basename($name)===$name;}}namespace Magento\PatchStatus\Detector;final class ComposerDetector{private const BASE_PACKAGES=['magento/product-enterprise-edition','magento/product-community-edition','magento/magento2-base',];public function __construct(private readonly string $magentoRoot){}public function detect():array{$lockFile=rtrim($this->magentoRoot,'/').'/composer.lock';$empty=['base_version'=>null,'release_line'=>null,'installed_packages'=>[],'method'=>'none','warnings'=>[]];if(!file_exists($lockFile)){return $empty;}$raw=file_get_contents($lockFile);if($raw===false){return array_merge($empty,['warnings'=>['composer.lock exists but could not be read']]);}$lock=json_decode($raw,true);if(!is_array($lock)){return array_merge($empty,['warnings'=>['composer.lock could not be parsed as JSON']]);}$packages=array_merge($lock['packages']??[],$lock['packages-dev']??[]);$installedPackages=[];foreach($packages as $pkg){$installedPackages[$pkg['name']??'']=$pkg['version']??'';}$baseVersion=null;foreach(self::BASE_PACKAGES as $pkg){if(isset($installedPackages[$pkg])){$baseVersion=ltrim($installedPackages[$pkg],'v');break;}}$warnings=[];$method='composer';if($baseVersion===null){$warnings[]='No recognized Commerce base package found in composer.lock';$method='none';}$releaseLine=$baseVersion!==null?$this->extractReleaseLine($baseVersion):null;return['base_version'=>$baseVersion,'release_line'=>$releaseLine,'installed_packages'=>$installedPackages,'method'=>$method,'warnings'=>$warnings,];}private function extractReleaseLine(string $version):string{if(preg_match('/^(\d+\.\d+\.\d+)/',$version,$m)){return $m[1];}return $version;}}namespace Magento\PatchStatus\Detector;use Magento\PatchStatus\Fetcher\PatchFetcher;class DryRunDetector{public function __construct(private readonly string $magentoRoot,private readonly array $registry,private readonly PatchFetcher $fetcher,){}public static function isPatchBinaryAvailable():bool{exec('patch --version',$output,$code);return $code===0;}public function detect(array $applicablePatchIds):array{$statuses=[];$warnings=[];$unknownLogs=[];$root=rtrim($this->magentoRoot,'/');if(!$this->isTempDirWritable()){throw new \RuntimeException("Temp directory ".sys_get_temp_dir()." is not writable — check permissions. Aborting.");}foreach($applicablePatchIds as $patchId){$entry=$this->registry['patches'][$patchId]??null;if($entry===null){continue;}$patchFile=$entry['file_name']??null;$patchSha256=$entry['sha256']??null;if($patchFile===null||$patchSha256===null){$statuses[$patchId]='unknown';$warnings[]="No file_name or sha256 for {$patchId}";continue;}$authRequired=!empty($entry['entitlements']??[]);$rawContent=$this->fetcher->fetch($patchId,$patchFile,$patchSha256,$authRequired,$warnings);if($rawContent===null){$statuses[$patchId]='unknown';continue;}$diffContent=$rawContent;$descendants=$this->getDescendants($patchId,$applicablePatchIds);$prerequisites=$this->getPrerequisites($patchId,$applicablePatchIds,$warnings);[$overlappingDescDiffs,$overlappingPrereqDiffs,$missingDepIds]=$this->resolveDependencyDiffs($diffContent,$descendants,$prerequisites);if(!empty($missingDepIds)){$warnings[]='descendant diffs unavailable for '.implode(', ',$missingDepIds)."; dry-run for {$patchId} may be inaccurate";}$affectedFiles=$this->collectAffectedFiles($diffContent,$overlappingDescDiffs,$overlappingPrereqDiffs);$tmpDiff=sys_get_temp_dir().'/patch_status_'.$this->sanitizeForFilename($patchId).'_'.uniqid().'.diff';file_put_contents($tmpDiff,$diffContent);$tmpDirToClean=null;$descendantSanitizationFailed=false;try{$workDir=$root;if(!empty($overlappingDescDiffs)){$tmpDirToClean=$this->createTempWorkDir($root,$patchId,$affectedFiles);$revertWarn=$this->revertDescendantsIn($tmpDirToClean,$patchId,$overlappingDescDiffs);if($revertWarn!==null){$warnings[]=$revertWarn;$this->rmdirRecursive($tmpDirToClean);$tmpDirToClean=null;$descendantSanitizationFailed=true;}else{$workDir=$tmpDirToClean;}}$fwd=$this->runPatch($tmpDiff,$workDir,reverse:false,dryRun:true);$rev=$this->runPatch($tmpDiff,$workDir,reverse:true,dryRun:true);$status=$this->classify($fwd['exit'],$rev['exit']);if($status==='unknown'&&!empty($overlappingPrereqDiffs)&&!$descendantSanitizationFailed){if($tmpDirToClean===null){$tmpDirToClean=$this->createTempWorkDir($root,$patchId,$affectedFiles);$workDir=$tmpDirToClean;}$applyWarn=$this->forwardApplyPrereqsIn($tmpDirToClean,$patchId,$overlappingPrereqDiffs);if($applyWarn!==null){$warnings[]=$applyWarn;}else{$fwd=$this->runPatch($tmpDiff,$workDir,reverse:false,dryRun:true);$rev=$this->runPatch($tmpDiff,$workDir,reverse:true,dryRun:true);$status=$this->classify($fwd['exit'],$rev['exit']);}}$statuses[$patchId]=$status;if($status==='unknown'){$unknownLogs[$patchId]="FWD:\n{$fwd['output']}\nREV:\n{$rev['output']}";}}finally{@unlink($tmpDiff);if($tmpDirToClean!==null){$this->rmdirRecursive($tmpDirToClean);}}}return['statuses'=>$statuses,'method'=>'dry_run','warnings'=>$warnings,'unknown_logs'=>$unknownLogs,];}private function getDescendants(string $patchId,array $applicablePatchIds):array{$applicableSet=array_flip($applicablePatchIds);$descendants=[];$queue=[$patchId];$visited=[$patchId=>true];while(!empty($queue)){$current=array_shift($queue);foreach($this->registry['patches']??[]as $id=>$entry){if(!isset($applicableSet[$id])||isset($visited[$id])){continue;}if(in_array($current,$entry['requires']??[],true)){$descendants[]=$id;$visited[$id]=true;$queue[]=$id;}}}return $descendants;}private function getPrerequisites(string $patchId,array $applicablePatchIds,array&$warnings):array{$applicableSet=array_flip($applicablePatchIds);$result=[];$visited=[$patchId=>true];$this->collectTransitivePrereqs($patchId,$applicableSet,$visited,$result,$warnings);return $result;}private function collectTransitivePrereqs(string $patchId,array $applicableSet,array&$visited,array&$result,array&$warnings):void{$requires=$this->registry['patches'][$patchId]['requires']??[];foreach($requires as $preId){if(isset($visited[$preId])){continue;}$visited[$preId]=true;if(!isset($this->registry['patches'][$preId])){$warnings[]="Registry entry '{$patchId}' requires unknown patch '{$preId}'; skipping.";continue;}if(!isset($applicableSet[$preId])){continue;}$this->collectTransitivePrereqs($preId,$applicableSet,$visited,$result,$warnings);$result[]=$preId;}}private function resolveDependencyDiffs(string $diffContent,array $descendants,array $prerequisites):array{$pFiles=array_flip($this->parseDiffFiles($diffContent));$missingDepIds=[];$overlappingDescDiffs=[];foreach(array_reverse($descendants)as $depId){$diff=$this->fetchDependencyDiff($depId);if($diff===null){$missingDepIds[]=$depId;continue;}if($this->diffOverlapsFiles($diff,$pFiles)){$overlappingDescDiffs[$depId]=$diff;}}$overlappingPrereqDiffs=[];foreach($prerequisites as $preId){$diff=$this->fetchDependencyDiff($preId);if($diff===null){continue;}if($this->diffOverlapsFiles($diff,$pFiles)){$overlappingPrereqDiffs[$preId]=$diff;}}return[$overlappingDescDiffs,$overlappingPrereqDiffs,$missingDepIds];}private function fetchDependencyDiff(string $patchId):?string{$entry=$this->registry['patches'][$patchId]??null;if($entry===null){return null;}$authRequired=!empty($entry['entitlements']??[]);$raw=$this->fetcher->fetch($patchId,$entry['file_name']??'',$entry['sha256']??'',$authRequired);if($raw===null){return null;}return $raw;}private function diffOverlapsFiles(string $diff,array $fileSet):bool{foreach($this->parseDiffFiles($diff)as $f){if(isset($fileSet[$f])){return true;}}return false;}private function collectAffectedFiles(string $diffContent,array $overlappingDescDiffs,array $overlappingPrereqDiffs):array{$files=$this->parseDiffFiles($diffContent);foreach($overlappingDescDiffs as $d){$files=array_merge($files,$this->parseDiffFiles($d));}foreach($overlappingPrereqDiffs as $d){$files=array_merge($files,$this->parseDiffFiles($d));}return array_values(array_unique($files));}private function createTempWorkDir(string $root,string $patchId,array $affectedFiles):string{$tmpDir=sys_get_temp_dir().'/patch_status_wd_'.$this->sanitizeForFilename($patchId).'_'.uniqid();if(!mkdir($tmpDir,0700,true)){throw new \RuntimeException("Could not create temp workdir {$tmpDir}");}try{foreach($affectedFiles as $relPath){$src=$root.'/'.$relPath;if(!file_exists($src)){continue;}$dst=$tmpDir.'/'.$relPath;$dstDir=dirname($dst);if(!is_dir($dstDir)&&!mkdir($dstDir,0700,true)){throw new \RuntimeException("Could not create directory {$dstDir} in temp workdir");}if(!copy($src,$dst)){throw new \RuntimeException("Could not copy {$relPath} into temp workdir");}}}catch(\RuntimeException $e){$this->rmdirRecursive($tmpDir);throw $e;}return $tmpDir;}private function revertDescendantsIn(string $workDir,string $patchId,array $overlappingDescDiffs):?string{foreach($overlappingDescDiffs as $depId=>$depDiff){$tmpDepDiff=sys_get_temp_dir().'/patch_status_dep_'.$this->sanitizeForFilename($depId).'_'.uniqid().'.diff';file_put_contents($tmpDepDiff,$depDiff);$check=$this->runPatch($tmpDepDiff,$workDir,reverse:true,dryRun:true);if($check['exit']!==0){@unlink($tmpDepDiff);continue;}$result=$this->runPatch($tmpDepDiff,$workDir,reverse:true,dryRun:false);@unlink($tmpDepDiff);if($result['exit']!==0){return"Failed to reverse-apply {$depId} when preparing dry-run for {$patchId}; result may be inaccurate";}}return null;}private function forwardApplyPrereqsIn(string $workDir,string $patchId,array $overlappingPrereqDiffs):?string{foreach($overlappingPrereqDiffs as $preId=>$preDiff){$tmpPreDiff=sys_get_temp_dir().'/patch_status_pre_'.$this->sanitizeForFilename($preId).'_'.uniqid().'.diff';file_put_contents($tmpPreDiff,$preDiff);$checkRev=$this->runPatch($tmpPreDiff,$workDir,reverse:true,dryRun:true);if($checkRev['exit']===0){@unlink($tmpPreDiff);continue;}$result=$this->runPatch($tmpPreDiff,$workDir,reverse:false,dryRun:false);@unlink($tmpPreDiff);if($result['exit']!==0){return"Failed to forward-apply prerequisite {$preId} when preparing dry-run for {$patchId}; result may be inaccurate";}}return null;}protected function runPatch(string $diffFile,string $workDir,bool $reverse,bool $dryRun):array{$args=['patch','-p1','--fuzz=0','--batch','--forward'];if($reverse){$args[]='-R';}if($dryRun){$args[]='--dry-run';}$args[]='-d';$args[]=$workDir;$args[]='-i';$args[]=$diffFile;$cmd=implode(' ',array_map('escapeshellarg',$args)).' 2>&1';$descriptors=[0=>['pipe','r'],1=>['pipe','w']];$process=proc_open($cmd,$descriptors,$pipes);if(!is_resource($process)){return['exit'=>-1,'output'=>''];}fclose($pipes[0]);$output=(string)stream_get_contents($pipes[1]);fclose($pipes[1]);$exit=proc_close($process);return['exit'=>$exit,'output'=>trim($output)];}private function classify(int $fwdExit,int $revExit):string{return match(true){$fwdExit!==0&&$revExit===0=>'applied',$fwdExit===0&&$revExit!==0=>'not_applied',default=>'unknown',};}private function parseDiffFiles(string $diffContent):array{$files=[];foreach(explode("\n",$diffContent)as $line){if(preg_match('#^(?:---|\+\+\+) [ab]/(.+)$#',$line,$m)){$path=trim($m[1]);if($path!=='/dev/null'){$files[$path]=true;}}}return array_keys($files);}private function rmdirRecursive(string $path):void{if(!is_dir($path)){return;}$entries=scandir($path);if($entries===false){return;}foreach($entries as $item){if($item==='.'||$item==='..'){continue;}$full=$path.'/'.$item;is_dir($full)?$this->rmdirRecursive($full):unlink($full);}rmdir($path);}protected function isTempDirWritable():bool{return is_writable(sys_get_temp_dir());}private function sanitizeForFilename(string $id):string{$sanitized=preg_replace('/[^A-Za-z0-9_.\-]/','_',$id);if($sanitized!==null){return $sanitized;}return'patch_'.sha1($id);}}namespace Magento\PatchStatus\Registry;use Magento\PatchStatus\Util\UrlValidator;class RegistryLoader{public const REMOTE_URL='https://repo.magento.com/patch/patch-registry.json';private const CACHE_FILE='var/patch_metadata/.patch_registry_cache.json';private const CACHE_TTL=3600;private const TIMEOUT=3;public function __construct(private readonly string $magentoRoot,private readonly bool $forceRefresh=false,){}public function load():array{$cachePath=rtrim($this->magentoRoot,'/').'/'.self::CACHE_FILE;$warnings=[];$cached=$this->forceRefresh?null:$this->readCache($cachePath);if($cached!==null&&$this->cacheAge($cachePath)<self::CACHE_TTL){return['registry'=>$cached,'source'=>'cache','warnings'=>[]];}$remote=$this->fetchRemote($warnings);if($remote!==null){$this->writeCache($cachePath,$remote);return['registry'=>$remote,'source'=>'remote','warnings'=>[]];}if($this->forceRefresh){$warnings[]='Could not fetch remote registry and --no-cache was set; aborting.';return['registry'=>[],'source'=>'none','warnings'=>$warnings];}if($cached!==null){$ageHours=(int)round($this->cacheAge($cachePath)/3600);$warnings[]=sprintf('Could not load remote registry. Using cached registry (%d hour%s old). CVE coverage may be incomplete.',$ageHours,$ageHours===1?'':'s',);return['registry'=>$cached,'source'=>'stale_cache','warnings'=>$warnings];}$warnings[]='Patch registry could not be loaded.';return['registry'=>[],'source'=>'none','warnings'=>$warnings];}protected function fetchRemote(array&$warnings):?array{$context=stream_context_create(['http'=>['timeout'=>self::TIMEOUT,'ignore_errors'=>true,'user_agent'=>'Adobe-Commerce-PatchStatus/'.\Magento\PatchStatus\PatchStatusCommand::VERSION,],'ssl'=>['verify_peer'=>true,'verify_peer_name'=>true,],]);$override=getenv('PATCH_REGISTRY_URL');if($override!==false&&trim($override)!==''){$override=trim($override);if(!UrlValidator::isValid($override)){throw new \InvalidArgumentException('Environment variable PATCH_REGISTRY_URL contains an invalid URL (must be https).');}$url=$override;}else{$url=self::REMOTE_URL;}$raw=@file_get_contents($url,context:$context);if($raw===false){return null;}$status=$this->parseHttpStatus($http_response_header??[]);if($status>=400){$warnings[]=sprintf('Remote registry fetch failed (HTTP %d). Check PATCH_REGISTRY_URL (if set) and network connectivity.',$status,);return null;}$data=json_decode($raw,true);if(!is_array($data)){$warnings[]='Remote registry response was not valid JSON; ignoring.';return null;}return $data;}private function parseHttpStatus(array $responseHeaders):int{$status=0;foreach($responseHeaders as $header){if(preg_match('#^HTTP/\S+ (\d{3})#',$header,$m)){$status=(int)$m[1];}}return $status;}private function readCache(string $path):?array{if(!file_exists($path)){return null;}$raw=@file_get_contents($path);if($raw===false){return null;}$data=json_decode($raw,true);return is_array($data)?$data:null;}private function writeCache(string $path,array $data):void{$dir=dirname($path);if(!is_dir($dir)){@mkdir($dir,0775,true);}@file_put_contents($path,json_encode($data),LOCK_EX);}private function cacheAge(string $path):int{$mtime=@filemtime($path);return $mtime!==false?(time()-$mtime):PHP_INT_MAX;}}namespace Magento\PatchStatus\Resolver;final class PatchResolver{public function __construct(private readonly array $registry){}public function getApplicableIds(array $componentVersions,array $installedAreas):array{$assumeAll=empty($installedAreas)||empty($componentVersions);return array_keys($this->applicablePatches($componentVersions,$installedAreas,$assumeAll));}public function resolve(array $appliedIds,array $componentVersions,array $installedAreas=[]):array{$warnings=[];$assumeAll=empty($installedAreas)||empty($componentVersions);if($assumeAll){$warnings[]='Installed components could not be detected; all patches treated as applicable. Results may include patches irrelevant to this installation.';}$applicable=$this->applicablePatches($componentVersions,$installedAreas,$assumeAll);if(empty($applicable)){$versionsStr=implode(', ',array_map(fn($a,$v)=>"{$a}={$v}",array_keys($componentVersions),array_values($componentVersions)));$warnings[]="No patches found in registry for installed component versions ({$versionsStr})";return['missing'=>[],'warnings'=>$warnings,];}$appliedSet=array_flip($appliedIds);$missing=[];foreach($applicable as $patchId=>$patch){if(!isset($appliedSet[$patchId])){$missing[]=$patchId;}}return['missing'=>$missing,'warnings'=>$warnings,];}private function applicablePatches(array $componentVersions,array $installedAreas,bool $assumeAll):array{$areaSet=$assumeAll?null:array_flip($installedAreas);$result=[];foreach($this->registry['patches']??[]as $patchId=>$patch){if($assumeAll){$result[$patchId]=$patch;continue;}$area=$patch['area']??'';if($areaSet!==null&&!isset($areaSet[$area])){continue;}$installedVersion=$componentVersions[$area]??null;if($installedVersion===null){continue;}if(!in_array($installedVersion,$patch['applies_to']??[],true)){continue;}$result[$patchId]=$patch;}return $result;}}namespace Magento\PatchStatus\Resolver;final class CveResolver{public function __construct(private readonly array $registry){}public function resolve(array $appliedIds,array $missingIds=[],array $installedAreas=[],array $componentVersions=[],array $unknownIds=[],):array{$appliedSet=array_flip($appliedIds);$unknownSet=array_flip($unknownIds);$areaSet=!empty($installedAreas)?array_flip($installedAreas):null;$byCve=[];foreach($this->registry['patches']??[]as $patchId=>$patch){$patchArea=$patch['area']??'CE';if(!empty($componentVersions)){$areaIsInstalled=$areaSet===null||isset($areaSet[$patchArea]);if($areaIsInstalled){$installedVersion=$componentVersions[$patchArea]??null;if($installedVersion===null||!in_array($installedVersion,$patch['applies_to']??[],true)){continue;}}}if(isset($appliedSet[$patchId])){$patchStatus='PROTECTED';}elseif($areaSet!==null&&!isset($areaSet[$patchArea])){$patchStatus='NOT_APPLICABLE';}elseif(isset($unknownSet[$patchId])){$patchStatus='UNKNOWN';}else{$patchStatus='VULNERABLE';}foreach($patch['cves']??[]as $cve){$byCve[$cve][$patchStatus]=true;}}$status=[];foreach($byCve as $cve=>$statuses){$status[$cve]=['status'=>match(true){isset($statuses['VULNERABLE'])=>'VULNERABLE',isset($statuses['UNKNOWN'])=>'UNKNOWN',isset($statuses['PROTECTED'])=>'PROTECTED',default=>'NOT_APPLICABLE',},];}ksort($status);return $status;}}namespace Magento\PatchStatus\Formatter;use Magento\PatchStatus\Model\PatchStatus;final class JsonFormatter{public function format(PatchStatus $status):string{return json_encode($status->toArray(),JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)."\n";}}namespace Magento\PatchStatus\Formatter;use Magento\PatchStatus\Model\PatchStatus;final class CsvFormatter{private const HEADERS=['base_version','installed_components','applied_patches','missing_patches','unknown_patches','cve','cve_status',];public function format(PatchStatus $status):string{$buf=fopen('php://temp','r+');fputcsv($buf,self::HEADERS,separator:',',enclosure:'"',escape:'\\');$common=[$status->baseVersion,implode(';',array_map(static fn($area,$ver)=>"{$area}:{$ver}",array_keys($status->installedComponents),$status->installedComponents,)),implode(';',$status->appliedPatches),implode(';',$status->missingPatches),implode(';',$status->unknownPatches),];if(empty($status->vulnerabilityStatus)){fputcsv($buf,array_merge($common,['','']),separator:',',enclosure:'"',escape:'\\');}else{foreach($status->vulnerabilityStatus as $cve=>$info){fputcsv($buf,array_merge($common,[$cve,$info['status'],]),separator:',',enclosure:'"',escape:'\\');}}rewind($buf);$content=stream_get_contents($buf);fclose($buf);return $content;}}namespace Magento\PatchStatus;use Magento\PatchStatus\Credential\ComposerCredentialResolver;use Magento\PatchStatus\Detector\ComposerDetector;use Magento\PatchStatus\Detector\DryRunDetector;use Magento\PatchStatus\Fetcher\PatchFetcher;use Magento\PatchStatus\Formatter\CsvFormatter;use Magento\PatchStatus\Formatter\JsonFormatter;use Magento\PatchStatus\Model\PatchStatus;use Magento\PatchStatus\Registry\RegistryLoader;use Magento\PatchStatus\Resolver\CveResolver;use Magento\PatchStatus\Resolver\PatchResolver;use Magento\PatchStatus\Util\UrlValidator;class PatchStatusCommand{public const VERSION='1.0.0';private const LOG_FILE='var/log/patch_status.log';private string $root='.';private string $format='json';private bool $noCache=false;public function run(array $argv):int{try{return $this->doRun($argv);}catch(\InvalidArgumentException $e){$this->error($e->getMessage());return 1;}}private function doRun(array $argv):int{$this->parseArgs($argv);$loaded=$this->makeRegistryLoader($this->root,forceRefresh:$this->noCache)->load();$warnings=$loaded['warnings'];$registry=$loaded['registry'];if(empty($registry)){foreach($warnings as $warning){$this->error($warning);}if(empty($warnings)){$this->error('Cannot load patch registry');}return 1;}$comp=(new ComposerDetector($this->root))->detect();$warnings=array_merge($warnings,$comp['warnings']);$baseVersion=$comp['base_version']??'unknown';$areaDefinitions=$registry['_areas']??[];$installedAreas=[];$componentVersions=[];foreach($areaDefinitions as $area=>$def){if(($def['detection']??'')==='base_version'){if($baseVersion!=='unknown'){$installedAreas[]=$area;$componentVersions[$area]=$baseVersion;}}elseif(isset($def['composer_package'])){$pkg=$def['composer_package'];if(isset($comp['installed_packages'][$pkg])){$installedAreas[]=$area;$componentVersions[$area]=ltrim($comp['installed_packages'][$pkg],'v');}}}if($baseVersion==='unknown'){$status=new PatchStatus(baseVersion:'unknown',appliedPatches:[],missingPatches:[],installedComponents:[],vulnerabilityStatus:[],warnings:array_values(array_unique($warnings)),registrySource:$loaded['source'],);echo match($this->format){'csv'=>(new CsvFormatter())->format($status),default=>(new JsonFormatter())->format($status),};return 1;}if(!$this->isPatchBinaryAvailable()){$this->error('patch(1) binary not found. Install the patch utility and try again.');return 1;}$patchResolver=new PatchResolver($registry);$applicableIds=$patchResolver->getApplicableIds($componentVersions,$installedAreas);if(empty($applicableIds)){$versionsStr=implode(', ',array_map(fn($a,$v)=>"{$a}={$v}",array_keys($componentVersions),array_values($componentVersions),));$warnings[]="No patches found in registry for installed component versions ({$versionsStr})";}try{$detected=$this->runDryRunDetection($applicableIds,$registry);}catch(\RuntimeException $e){$this->error($e->getMessage());return 1;}$warnings=array_merge($warnings,$detected['warnings']);$unknownLogs=$detected['unknown_logs'];$appliedPatches=[];$missingPatches=[];$unknownPatches=[];foreach($detected['statuses']as $patchId=>$patchStatus){match($patchStatus){'applied'=>$appliedPatches[]=$patchId,'not_applied'=>$missingPatches[]=$patchId,'unknown'=>$unknownPatches[]=$patchId,default=>null,};}$cveResolver=new CveResolver($registry);$vulnStatus=$cveResolver->resolve($appliedPatches,$missingPatches,$installedAreas,$componentVersions,$unknownPatches,);$status=new PatchStatus(baseVersion:$baseVersion,appliedPatches:array_values($appliedPatches),missingPatches:array_values($missingPatches),installedComponents:$componentVersions,vulnerabilityStatus:$vulnStatus,warnings:array_values(array_unique($warnings)),registrySource:$loaded['source'],unknownPatches:array_values($unknownPatches),);$output=match($this->format){'csv'=>(new CsvFormatter())->format($status),default=>(new JsonFormatter())->format($status),};echo $output;$this->writeLog($status,$unknownLogs);return 0;}protected function makeRegistryLoader(string $magentoRoot,bool $forceRefresh):RegistryLoader{return new RegistryLoader(magentoRoot:$magentoRoot,forceRefresh:$forceRefresh);}protected function isPatchBinaryAvailable():bool{return DryRunDetector::isPatchBinaryAvailable();}protected function runDryRunDetection(array $applicableIds,array $registry):array{$override=getenv('PATCH_DIFF_BASE_URL');if($override!==false&&trim($override)!==''){$override=trim($override);if(!UrlValidator::isValid($override)){throw new \InvalidArgumentException('Environment variable PATCH_DIFF_BASE_URL contains an invalid URL (must be https).');}$baseUrl=$override;}else{$baseUrl=PatchFetcher::DIFF_BASE_URL;}$needsAuth=false;foreach($applicableIds as $id){if(!empty($registry['patches'][$id]['entitlements']??[])){$needsAuth=true;break;}}$credentials=null;if($needsAuth){$host=(string)(parse_url($baseUrl,PHP_URL_HOST)??'');$credentials=(new ComposerCredentialResolver())->resolve($this->root,$host);}$fetcher=new PatchFetcher($this->root,$baseUrl,$credentials,noCache:$this->noCache);$detector=new DryRunDetector($this->root,$registry,$fetcher);return $detector->detect($applicableIds);}private function parseArgs(array $argv):void{foreach(array_slice($argv,1)as $arg){if(preg_match('/^--root=(.+)$/',$arg,$m)){$this->root=rtrim($m[1],'/');}elseif(preg_match('/^--format=(json|csv)$/',$arg,$m)){$this->format=$m[1];}elseif($arg==='--no-cache'){$this->noCache=true;}elseif(in_array($arg,['--version','-V'],true)){echo'patch-status '.self::VERSION."\n";exit(0);}elseif(in_array($arg,['--help','-h'],true)){$this->printUsage();exit(0);}}}private function printUsage():void{$version=self::VERSION;echo"Adobe Commerce Monthly Security Release Versioning Tool v{$version}\n\n"."Usage:\n"."  vendor/bin/patch-status [OPTIONS]\n\n"."Options:\n"."  --root=PATH           Path to Commerce installation root (default: current directory)\n"."  --format=FORMAT       Output format: json (default) or csv\n"."  --no-cache            Bypass all local caches (registry and patch diffs); force fresh fetches from remote; exits with an error if the remote registry is unreachable\n"."  --version             Show version\n"."  --help                Show this help message\n\n"."Note: Output format is not final and may change in future releases.\n\n";}private function writeLog(PatchStatus $status,array $unknownLogs):void{$logPath=rtrim($this->root,'/').'/'.self::LOG_FILE;$logDir=dirname($logPath);if(!is_dir($logDir)&&!@mkdir($logDir,0775,true)){return;}$line=sprintf("[%s] base=%s applied=[%s] missing=[%s] unknown=[%s]\n",date('c'),$status->baseVersion,implode(',',$status->appliedPatches),implode(',',$status->missingPatches),implode(',',$status->unknownPatches),);@file_put_contents($logPath,$line,FILE_APPEND|LOCK_EX);foreach($unknownLogs as $patchId=>$logOutput){$block=sprintf("[%s] UNKNOWN %s:\n%s\n",date('c'),$patchId,$logOutput);@file_put_contents($logPath,$block,FILE_APPEND|LOCK_EX);}}private function error(string $msg):void{fwrite(STDERR,"patch-status: {$msg}\n");}}
+-$command=new PatchStatusCommand();exit($command->run($argv));
++#!/usr/bin/env php
++<?php declare(strict_types=1);/* Adobe Commerce Monthly Security Release Versioning Tool — single-file build. Auto-generated by scripts/build.php. Requires PHP 8.1+. */namespace Magento\PatchStatus\Model;final class PatchStatus{public function __construct(public readonly string $baseVersion,public readonly array $appliedPatches,public readonly array $missingPatches,public readonly array $installedComponents,public readonly array $vulnerabilityStatus,public readonly array $warnings=[],public readonly string $registrySource='none',public readonly array $unknownPatches=[],){}public static function fromArray(array $data):self{return new self(baseVersion:$data['base_version']??'unknown',appliedPatches:$data['applied_patches']??[],missingPatches:$data['missing_patches']??[],vulnerabilityStatus:$data['vulnerability_status']??[],installedComponents:$data['installed_components']??[],warnings:$data['warnings']??[],registrySource:$data['registry_source']??'none',unknownPatches:$data['unknown_patches']??[],);}public function toArray():array{return['base_version'=>$this->baseVersion,'installed_components'=>$this->installedComponents,'applied_patches'=>$this->appliedPatches,'missing_patches'=>$this->missingPatches,'unknown_patches'=>$this->unknownPatches,'vulnerability_status'=>$this->vulnerabilityStatus,'registry_source'=>$this->registrySource,'warnings'=>$this->warnings,];}}namespace Magento\PatchStatus\Util;class UrlValidator{public static function isValid(string $url):bool{if(filter_var($url,FILTER_VALIDATE_URL)===false){return false;}$scheme=parse_url($url,PHP_URL_SCHEME);return is_string($scheme)&&strtolower($scheme)==='https';}}namespace Magento\PatchStatus\Credential;class ComposerCredentialResolver{public function resolve(string $magentoRoot,string $host):?array{$creds=$this->readComposerAuthEnv($host);if($creds!==null){return $creds;}$paths=array_merge([rtrim($magentoRoot,'/').'/auth.json'],$this->globalAuthJsonPaths(),);foreach($paths as $path){$creds=$this->readCredentials($path,$host);if($creds!==null){return $creds;}}$creds=$this->promptCredentials($host);if($creds!==null){$this->offerToSaveCredentials($magentoRoot,$creds,$host);return $creds;}return null;}protected function globalAuthJsonPaths():array{$composerHome=getenv('COMPOSER_HOME');if($composerHome!==false&&$composerHome!==''){return[rtrim($composerHome,'/').'/auth.json'];}$home=getenv('HOME');if($home!==false&&$home!==''){return[rtrim($home,'/').'/.composer/auth.json'];}return[];}protected function promptCredentials(string $host):?array{$isTty=function_exists('stream_isatty')?stream_isatty(STDIN):(function_exists('posix_isatty')?posix_isatty(STDIN):false);if(!$isTty){return null;}fwrite(STDERR,"\n{$host} credentials required.\n");fwrite(STDERR,'Username (Composer public key): ');$username=trim((string)fgets(STDIN));fwrite(STDERR,'Password (Composer private key): ');$canHideInput=function_exists('shell_exec');if($canHideInput){shell_exec('stty -echo');}try{$password=trim((string)fgets(STDIN));}finally{if($canHideInput){shell_exec('stty echo');}}fwrite(STDERR,"\n");if($username===''||$password===''){return null;}return['username'=>$username,'password'=>$password];}protected function offerToSaveCredentials(string $magentoRoot,array $credentials,string $host):void{$isTty=function_exists('stream_isatty')?stream_isatty(STDIN):(function_exists('posix_isatty')?posix_isatty(STDIN):false);if(!$isTty){return;}$authJsonPath=rtrim($magentoRoot,'/').'/auth.json';$action=file_exists($authJsonPath)?'Update':'Create';fwrite(STDERR,"{$action} {$authJsonPath} with these credentials? [Y/n]: ");$rawResponse=fgets(STDIN);if($rawResponse===false){return;}$response=strtolower(trim($rawResponse));if($response!=='n'&&$response!=='no'){$this->saveCredentialsToAuthJson($authJsonPath,$credentials,$host);}}protected function saveCredentialsToAuthJson(string $path,array $credentials,string $host):void{$data=[];if(file_exists($path)){$existing=@file_get_contents($path);if($existing!==false){$decoded=json_decode($existing,true);if(is_array($decoded)){$data=$decoded;}}}if(!is_array($data['http-basic']??null)){$data['http-basic']=[];}$data['http-basic'][$host]=['username'=>$credentials['username'],'password'=>$credentials['password'],];$encoded=json_encode($data,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);if($encoded===false){return;}$prevUmask=umask(0177);$written=false;try{$written=@file_put_contents($path,$encoded."\n",LOCK_EX)!==false;}finally{umask($prevUmask);}if($written){@chmod($path,0600);}}private function readComposerAuthEnv(string $host):?array{$raw=getenv('COMPOSER_AUTH');if($raw===false||$raw===''){return null;}$data=json_decode($raw,true);if(!is_array($data)){return null;}return $this->extractCredentials($data,$host);}private function readCredentials(string $path,string $host):?array{if(!file_exists($path)){return null;}$content=@file_get_contents($path);if($content===false){return null;}$data=json_decode($content,true);if(!is_array($data)){return null;}return $this->extractCredentials($data,$host);}private function extractCredentials(array $data,string $host):?array{if(!is_array($data['http-basic']??null)){return null;}$username=$data['http-basic'][$host]['username']??null;$password=$data['http-basic'][$host]['password']??null;if(!is_string($username)||$username===''||!is_string($password)||$password===''){return null;}return['username'=>$username,'password'=>$password];}}namespace Magento\PatchStatus\Fetcher;class PatchFetcher{public const DIFF_BASE_URL='https://repo.magento.com/patch';private const CACHE_DIR='var/patch_metadata/.patch_diffs';private const TIMEOUT=3;protected int $lastHttpStatus=0;public function __construct(private readonly string $magentoRoot,private readonly string $patchBaseUrl,private readonly?array $credentials=null,private readonly bool $noCache=false,){}public function hasCredentials():bool{return($this->credentials['username']??'')!==''&&($this->credentials['password']??'')!=='';}public function fetch(string $patchId,string $patchFile,string $expectedSha256,bool $authRequired=false,array&$warnings=[],):?string{if(!$this->isSafePatchFileName($patchFile)){return null;}$cachePath=rtrim($this->magentoRoot,'/').'/'.self::CACHE_DIR.'/'.$patchFile;if(!$this->noCache&&file_exists($cachePath)){$content=@file_get_contents($cachePath);if($content!==false&&$this->verifySha256($content,$expectedSha256)){return $content;}@unlink($cachePath);}if($authRequired&&!$this->hasCredentials()){$warnings[]="Patch {$patchId} requires authentication. Set credentials via COMPOSER_AUTH or auth.json.";return null;}$base=rtrim($this->patchBaseUrl,'/');$url=$authRequired?"{$base}/auth/{$patchFile}":"{$base}/{$patchFile}";$creds=$authRequired?$this->credentials:null;$content=$this->fetchRemote($url,$creds);if($content===false){$status=$this->lastHttpStatus;if($status>=400){$suffix=$authRequired?" Check credentials (COMPOSER_AUTH / auth.json).":"";$warnings[]="Could not fetch patch {$patchId} (HTTP {$status}).{$suffix}";}elseif($authRequired){$warnings[]="Could not fetch or verify patch {$patchId}. Check network connectivity and credentials (COMPOSER_AUTH / auth.json).";}else{$warnings[]="Could not fetch patch file for {$patchId}.";}return null;}if(!$this->verifySha256($content,$expectedSha256)){$warnings[]="SHA-256 verification failed for patch {$patchId}; discarding download.";return null;}$this->writeCache($cachePath,$content);return $content;}protected function fetchRemote(string $url,?array $credentials=null):string|false{$headers=[];if(($credentials['username']??'')!==''&&($credentials['password']??'')!==''){$encoded=base64_encode($credentials['username'].':'.$credentials['password']);$headers[]='Authorization: Basic '.$encoded;}$context=stream_context_create(['http'=>['timeout'=>self::TIMEOUT,'ignore_errors'=>true,'user_agent'=>'Adobe-Commerce-PatchStatus/'.\Magento\PatchStatus\PatchStatusCommand::VERSION,'header'=>implode("\r\n",$headers),],'ssl'=>['verify_peer'=>true,'verify_peer_name'=>true,],]);$this->lastHttpStatus=0;$content=@file_get_contents($url,context:$context);if($content!==false){$status=$this->parseResponseStatus($http_response_header??[]);$this->lastHttpStatus=$status;if($status>=400){return false;}}return $content;}private function parseResponseStatus(array $responseHeaders):int{$status=0;foreach($responseHeaders as $header){if(preg_match('#^HTTP/\S+ (\d{3})#',$header,$m)){$status=(int)$m[1];}}return $status;}private function verifySha256(string $content,string $expectedSha256):bool{return hash('sha256',$content)===strtolower($expectedSha256);}private function writeCache(string $path,string $content):void{$dir=dirname($path);if(!is_dir($dir)){@mkdir($dir,0775,true);}@file_put_contents($path,$content,LOCK_EX);}private function isSafePatchFileName(string $name):bool{return(bool)preg_match('/\A[A-Za-z0-9][A-Za-z0-9_\-]*\.(?:patch|diff)\z/',$name)&&basename($name)===$name;}}namespace Magento\PatchStatus\Detector;final class ComposerDetector{private const BASE_PACKAGES=['magento/product-enterprise-edition','magento/product-community-edition','magento/magento2-base',];public function __construct(private readonly string $magentoRoot){}public function detect():array{$lockFile=rtrim($this->magentoRoot,'/').'/composer.lock';$replacedPackages=$this->detectReplacedPackages();$empty=['base_version'=>null,'release_line'=>null,'installed_packages'=>[],'replaced_packages'=>$replacedPackages,'method'=>'none','warnings'=>[],];if(!file_exists($lockFile)){return $empty;}$raw=file_get_contents($lockFile);if($raw===false){return array_merge($empty,['warnings'=>['composer.lock exists but could not be read']]);}$lock=json_decode($raw,true);if(!is_array($lock)){return array_merge($empty,['warnings'=>['composer.lock could not be parsed as JSON']]);}$packages=array_merge($lock['packages']??[],$lock['packages-dev']??[]);$installedPackages=[];foreach($packages as $pkg){$installedPackages[$pkg['name']??'']=$pkg['version']??'';}$baseVersion=null;foreach(self::BASE_PACKAGES as $pkg){if(isset($installedPackages[$pkg])){$baseVersion=ltrim($installedPackages[$pkg],'v');break;}}$warnings=[];$method='composer';if($baseVersion===null){$warnings[]='No recognized Commerce base package found in composer.lock';$method='none';}$releaseLine=$baseVersion!==null?$this->extractReleaseLine($baseVersion):null;return['base_version'=>$baseVersion,'release_line'=>$releaseLine,'installed_packages'=>$installedPackages,'replaced_packages'=>$replacedPackages,'method'=>$method,'warnings'=>$warnings,];}private function detectReplacedPackages():array{$composerJsonFile=rtrim($this->magentoRoot,'/').'/composer.json';if(!file_exists($composerJsonFile)){return[];}$raw=file_get_contents($composerJsonFile);if($raw===false){return[];}$data=json_decode($raw,true);if(!is_array($data)||!is_array($data['replace']??null)){return[];}$replaced=[];foreach($data['replace']as $package=>$versionConstraint){if($versionConstraint==='*'){$replaced[]=$package;}}return $replaced;}private function extractReleaseLine(string $version):string{if(preg_match('/^(\d+\.\d+\.\d+)/',$version,$m)){return $m[1];}return $version;}}namespace Magento\PatchStatus\Detector;use Magento\PatchStatus\Fetcher\PatchFetcher;class DryRunDetector{public function __construct(private readonly string $magentoRoot,private readonly array $registry,private readonly PatchFetcher $fetcher,private readonly array $replacedVendorPrefixes=[],){}public static function isPatchBinaryAvailable():bool{exec('patch --version',$output,$code);return $code===0;}public function detect(array $applicablePatchIds):array{$statuses=[];$warnings=[];$unknownLogs=[];$root=rtrim($this->magentoRoot,'/');if(!$this->isTempDirWritable()){throw new \RuntimeException("Temp directory ".sys_get_temp_dir()." is not writable — check permissions. Aborting.");}foreach($applicablePatchIds as $patchId){$entry=$this->registry['patches'][$patchId]??null;if($entry===null){continue;}$patchFile=$entry['file_name']??null;$patchSha256=$entry['sha256']??null;if($patchFile===null||$patchSha256===null){$statuses[$patchId]='unknown';$warnings[]="No file_name or sha256 for {$patchId}";continue;}$authRequired=!empty($entry['entitlements']??[]);$rawContent=$this->fetcher->fetch($patchId,$patchFile,$patchSha256,$authRequired,$warnings);if($rawContent===null){$statuses[$patchId]='unknown';continue;}[$diffContent,$skippedPackages,$presentPackages]=$this->filterReplacedPackageHunks($rawContent);if($skippedPackages!==[]&&trim($diffContent)===''){$statuses[$patchId]='not_applicable';$warnings[]=sprintf('Patch %s only applies to package(s) %s not present due to composer replace config; '.'marked as not applicable.',$patchId,implode(', ',$skippedPackages),);continue;}$mixedPackages=array_values(array_intersect($skippedPackages,$presentPackages));$skippedOnly=array_values(array_diff($skippedPackages,$presentPackages));$presentOnly=array_values(array_diff($presentPackages,$skippedPackages));if($skippedOnly!==[]){$warnings[]=sprintf('Patch %s: skipped package(s) %s not present due to composer replace config.',$patchId,implode(', ',$skippedOnly),);}if($presentOnly!==[]){$warnings[]=sprintf('Patch %s: package(s) %s declared replaced at version "*" in composer.json, '.'but still present on disk; dry-run normally.',$patchId,implode(', ',$presentOnly),);}if($mixedPackages!==[]){$warnings[]=sprintf('Patch %s: package(s) %s declared replaced at version "*" in composer.json '.'and only partially present on disk; absent files skipped, remaining files dry-run normally.',$patchId,implode(', ',$mixedPackages),);}$descendants=$this->getDescendants($patchId,$applicablePatchIds);$prerequisites=$this->getPrerequisites($patchId,$applicablePatchIds,$warnings);[$overlappingDescDiffs,$overlappingPrereqDiffs,$missingDepIds]=$this->resolveDependencyDiffs($diffContent,$descendants,$prerequisites);if(!empty($missingDepIds)){$warnings[]='descendant diffs unavailable for '.implode(', ',$missingDepIds)."; dry-run for {$patchId} may be inaccurate";}$affectedFiles=$this->collectAffectedFiles($diffContent,$overlappingDescDiffs,$overlappingPrereqDiffs);$tmpDiff=sys_get_temp_dir().'/patch_status_'.$this->sanitizeForFilename($patchId).'_'.uniqid().'.diff';file_put_contents($tmpDiff,$diffContent);$tmpDirToClean=null;$descendantSanitizationFailed=false;try{$workDir=$root;if(!empty($overlappingDescDiffs)){$tmpDirToClean=$this->createTempWorkDir($root,$patchId,$affectedFiles);$revertWarn=$this->revertDescendantsIn($tmpDirToClean,$patchId,$overlappingDescDiffs);if($revertWarn!==null){$warnings[]=$revertWarn;$this->rmdirRecursive($tmpDirToClean);$tmpDirToClean=null;$descendantSanitizationFailed=true;}else{$workDir=$tmpDirToClean;}}$fwd=$this->runPatch($tmpDiff,$workDir,reverse:false,dryRun:true);$rev=$this->runPatch($tmpDiff,$workDir,reverse:true,dryRun:true);$status=$this->classify($fwd['exit'],$rev['exit']);if($status==='unknown'&&!empty($overlappingPrereqDiffs)&&!$descendantSanitizationFailed){if($tmpDirToClean===null){$tmpDirToClean=$this->createTempWorkDir($root,$patchId,$affectedFiles);$workDir=$tmpDirToClean;}$applyWarn=$this->forwardApplyPrereqsIn($tmpDirToClean,$patchId,$overlappingPrereqDiffs);if($applyWarn!==null){$warnings[]=$applyWarn;}else{$fwd=$this->runPatch($tmpDiff,$workDir,reverse:false,dryRun:true);$rev=$this->runPatch($tmpDiff,$workDir,reverse:true,dryRun:true);$status=$this->classify($fwd['exit'],$rev['exit']);}}$statuses[$patchId]=$status;if($status==='unknown'){$unknownLogs[$patchId]="FWD:\n{$fwd['output']}\nREV:\n{$rev['output']}";}}finally{@unlink($tmpDiff);if($tmpDirToClean!==null){$this->rmdirRecursive($tmpDirToClean);}}}return['statuses'=>$statuses,'method'=>'dry_run','warnings'=>$warnings,'unknown_logs'=>$unknownLogs,];}private function getDescendants(string $patchId,array $applicablePatchIds):array{$applicableSet=array_flip($applicablePatchIds);$descendants=[];$queue=[$patchId];$visited=[$patchId=>true];while(!empty($queue)){$current=array_shift($queue);foreach($this->registry['patches']??[]as $id=>$entry){if(!isset($applicableSet[$id])||isset($visited[$id])){continue;}if(in_array($current,$entry['requires']??[],true)){$descendants[]=$id;$visited[$id]=true;$queue[]=$id;}}}return $descendants;}private function getPrerequisites(string $patchId,array $applicablePatchIds,array&$warnings):array{$applicableSet=array_flip($applicablePatchIds);$result=[];$visited=[$patchId=>true];$this->collectTransitivePrereqs($patchId,$applicableSet,$visited,$result,$warnings);return $result;}private function collectTransitivePrereqs(string $patchId,array $applicableSet,array&$visited,array&$result,array&$warnings):void{$requires=$this->registry['patches'][$patchId]['requires']??[];foreach($requires as $preId){if(isset($visited[$preId])){continue;}$visited[$preId]=true;if(!isset($this->registry['patches'][$preId])){$warnings[]="Registry entry '{$patchId}' requires unknown patch '{$preId}'; skipping.";continue;}if(!isset($applicableSet[$preId])){continue;}$this->collectTransitivePrereqs($preId,$applicableSet,$visited,$result,$warnings);$result[]=$preId;}}private function resolveDependencyDiffs(string $diffContent,array $descendants,array $prerequisites):array{$pFiles=array_flip($this->parseDiffFiles($diffContent));$missingDepIds=[];$overlappingDescDiffs=[];foreach(array_reverse($descendants)as $depId){$diff=$this->fetchDependencyDiff($depId);if($diff===null){$missingDepIds[]=$depId;continue;}if($this->diffOverlapsFiles($diff,$pFiles)){$overlappingDescDiffs[$depId]=$diff;}}$overlappingPrereqDiffs=[];foreach($prerequisites as $preId){$diff=$this->fetchDependencyDiff($preId);if($diff===null){continue;}if($this->diffOverlapsFiles($diff,$pFiles)){$overlappingPrereqDiffs[$preId]=$diff;}}return[$overlappingDescDiffs,$overlappingPrereqDiffs,$missingDepIds];}private function fetchDependencyDiff(string $patchId):?string{$entry=$this->registry['patches'][$patchId]??null;if($entry===null){return null;}$authRequired=!empty($entry['entitlements']??[]);$raw=$this->fetcher->fetch($patchId,$entry['file_name']??'',$entry['sha256']??'',$authRequired);if($raw===null){return null;}[$filtered,]=$this->filterReplacedPackageHunks($raw);return $filtered;}private function diffOverlapsFiles(string $diff,array $fileSet):bool{foreach($this->parseDiffFiles($diff)as $f){if(isset($fileSet[$f])){return true;}}return false;}private function collectAffectedFiles(string $diffContent,array $overlappingDescDiffs,array $overlappingPrereqDiffs):array{$files=$this->parseDiffFiles($diffContent);foreach($overlappingDescDiffs as $d){$files=array_merge($files,$this->parseDiffFiles($d));}foreach($overlappingPrereqDiffs as $d){$files=array_merge($files,$this->parseDiffFiles($d));}return array_values(array_unique($files));}private function createTempWorkDir(string $root,string $patchId,array $affectedFiles):string{$tmpDir=sys_get_temp_dir().'/patch_status_wd_'.$this->sanitizeForFilename($patchId).'_'.uniqid();if(!mkdir($tmpDir,0700,true)){throw new \RuntimeException("Could not create temp workdir {$tmpDir}");}try{foreach($affectedFiles as $relPath){$src=$root.'/'.$relPath;if(!file_exists($src)){continue;}$dst=$tmpDir.'/'.$relPath;$dstDir=dirname($dst);if(!is_dir($dstDir)&&!mkdir($dstDir,0700,true)){throw new \RuntimeException("Could not create directory {$dstDir} in temp workdir");}if(!copy($src,$dst)){throw new \RuntimeException("Could not copy {$relPath} into temp workdir");}}}catch(\RuntimeException $e){$this->rmdirRecursive($tmpDir);throw $e;}return $tmpDir;}private function revertDescendantsIn(string $workDir,string $patchId,array $overlappingDescDiffs):?string{foreach($overlappingDescDiffs as $depId=>$depDiff){$tmpDepDiff=sys_get_temp_dir().'/patch_status_dep_'.$this->sanitizeForFilename($depId).'_'.uniqid().'.diff';file_put_contents($tmpDepDiff,$depDiff);$check=$this->runPatch($tmpDepDiff,$workDir,reverse:true,dryRun:true);if($check['exit']!==0){@unlink($tmpDepDiff);continue;}$result=$this->runPatch($tmpDepDiff,$workDir,reverse:true,dryRun:false);@unlink($tmpDepDiff);if($result['exit']!==0){return"Failed to reverse-apply {$depId} when preparing dry-run for {$patchId}; result may be inaccurate";}}return null;}private function forwardApplyPrereqsIn(string $workDir,string $patchId,array $overlappingPrereqDiffs):?string{foreach($overlappingPrereqDiffs as $preId=>$preDiff){$tmpPreDiff=sys_get_temp_dir().'/patch_status_pre_'.$this->sanitizeForFilename($preId).'_'.uniqid().'.diff';file_put_contents($tmpPreDiff,$preDiff);$checkRev=$this->runPatch($tmpPreDiff,$workDir,reverse:true,dryRun:true);if($checkRev['exit']===0){@unlink($tmpPreDiff);continue;}$result=$this->runPatch($tmpPreDiff,$workDir,reverse:false,dryRun:false);@unlink($tmpPreDiff);if($result['exit']!==0){return"Failed to forward-apply prerequisite {$preId} when preparing dry-run for {$patchId}; result may be inaccurate";}}return null;}protected function runPatch(string $diffFile,string $workDir,bool $reverse,bool $dryRun):array{$args=['patch','-p1','--fuzz=0','--batch','--forward'];if($reverse){$args[]='-R';}if($dryRun){$args[]='--dry-run';}$args[]='-d';$args[]=$workDir;$args[]='-i';$args[]=$diffFile;$cmd=implode(' ',array_map('escapeshellarg',$args)).' 2>&1';$descriptors=[0=>['pipe','r'],1=>['pipe','w']];$process=proc_open($cmd,$descriptors,$pipes);if(!is_resource($process)){return['exit'=>-1,'output'=>''];}fclose($pipes[0]);$output=(string)stream_get_contents($pipes[1]);fclose($pipes[1]);$exit=proc_close($process);return['exit'=>$exit,'output'=>trim($output)];}private function classify(int $fwdExit,int $revExit):string{return match(true){$fwdExit!==0&&$revExit===0=>'applied',$fwdExit===0&&$revExit!==0=>'not_applied',default=>'unknown',};}private function filterReplacedPackageHunks(string $diffContent):array{if($this->replacedVendorPrefixes===[]){return[$diffContent,[],[]];}$chunks=$this->splitDiffByFile($diffContent);if($chunks===[]){return[$diffContent,[],[]];}$kept=[];$skippedPackages=[];$presentPackages=[];foreach($chunks as $file=>$chunkText){$prefix=$this->matchingReplacedPrefix($file);if($prefix!==null){$package=$this->packageNameFromPrefix($prefix);if(!file_exists(rtrim($this->magentoRoot,'/').'/'.$file)){$skippedPackages[$package]=true;continue;}$presentPackages[$package]=true;}$kept[]=$chunkText;}if($skippedPackages===[]&&$presentPackages===[]){return[$diffContent,[],[]];}$filteredDiff='';foreach($kept as $chunkText){$filteredDiff.=rtrim($chunkText,"\n")."\n";}return[$filteredDiff,array_keys($skippedPackages),array_keys($presentPackages)];}private function matchingReplacedPrefix(string $file):?string{foreach($this->replacedVendorPrefixes as $prefix){if(str_starts_with($file,$prefix)){return $prefix;}}return null;}private function packageNameFromPrefix(string $prefix):string{$trimmed=rtrim($prefix,'/');return str_starts_with($trimmed,'vendor/')?substr($trimmed,strlen('vendor/')):$trimmed;}private function splitDiffByFile(string $diffContent):array{$lines=explode("\n",$diffContent);$hasGitHeaders=false;foreach($lines as $line){if(preg_match('#^diff --git a/.+ b/.+$#',$line)){$hasGitHeaders=true;break;}}$chunks=[];$currentFile=null;$currentLines=[];$count=count($lines);for($i=0;$i<$count;$i++){$line=$lines[$i];$boundaryFile=null;if($hasGitHeaders){if(preg_match('#^diff --git a/.+ b/(.+)$#',$line,$m)){$boundaryFile=trim($m[1]);}}elseif(str_starts_with($line,'--- ')){$prePath=$this->stripDiffMarkerPrefix($line);$nextLine=$lines[$i+1]??'';$postPath=str_starts_with($nextLine,'+++ ')?$this->stripDiffMarkerPrefix($nextLine):null;$boundaryFile=match(true){$postPath!==null&&$postPath!=='/dev/null'=>$postPath,$prePath!=='/dev/null'=>$prePath,default=>null,};}if($boundaryFile!==null){if($currentFile!==null){$chunks[$currentFile]=implode("\n",$currentLines);}$currentFile=$boundaryFile;$currentLines=[$line];continue;}if($currentFile!==null){$currentLines[]=$line;}}if($currentFile!==null){$chunks[$currentFile]=implode("\n",$currentLines);}return $chunks;}private function stripDiffMarkerPrefix(string $line):string{$path=trim(substr($line,4));if(preg_match('#^[ab]/(.+)$#',$path,$m)){return trim($m[1]);}return $path;}private function parseDiffFiles(string $diffContent):array{$files=[];foreach(explode("\n",$diffContent)as $line){if(preg_match('#^(?:---|\+\+\+) [ab]/(.+)$#',$line,$m)){$path=trim($m[1]);if($path!=='/dev/null'){$files[$path]=true;}}}return array_keys($files);}private function rmdirRecursive(string $path):void{if(!is_dir($path)){return;}$entries=scandir($path);if($entries===false){return;}foreach($entries as $item){if($item==='.'||$item==='..'){continue;}$full=$path.'/'.$item;is_dir($full)?$this->rmdirRecursive($full):unlink($full);}rmdir($path);}protected function isTempDirWritable():bool{return is_writable(sys_get_temp_dir());}private function sanitizeForFilename(string $id):string{$sanitized=preg_replace('/[^A-Za-z0-9_.\-]/','_',$id);if($sanitized!==null){return $sanitized;}return'patch_'.sha1($id);}}namespace Magento\PatchStatus\Registry;use Magento\PatchStatus\Util\UrlValidator;class RegistryLoader{public const REMOTE_URL='https://repo.magento.com/patch/patch-registry.json';private const CACHE_FILE='var/patch_metadata/.patch_registry_cache.json';private const CACHE_TTL=3600;private const TIMEOUT=3;public function __construct(private readonly string $magentoRoot,private readonly bool $forceRefresh=false,){}public function load():array{$cachePath=rtrim($this->magentoRoot,'/').'/'.self::CACHE_FILE;$warnings=[];$cached=$this->forceRefresh?null:$this->readCache($cachePath);if($cached!==null&&$this->cacheAge($cachePath)<self::CACHE_TTL){return['registry'=>$cached,'source'=>'cache','warnings'=>[]];}$remote=$this->fetchRemote($warnings);if($remote!==null){$this->writeCache($cachePath,$remote);return['registry'=>$remote,'source'=>'remote','warnings'=>[]];}if($this->forceRefresh){$warnings[]='Could not fetch remote registry and --no-cache was set; aborting.';return['registry'=>[],'source'=>'none','warnings'=>$warnings];}if($cached!==null){$ageHours=(int)round($this->cacheAge($cachePath)/3600);$warnings[]=sprintf('Could not load remote registry. Using cached registry (%d hour%s old). CVE coverage may be incomplete.',$ageHours,$ageHours===1?'':'s',);return['registry'=>$cached,'source'=>'stale_cache','warnings'=>$warnings];}$warnings[]='Patch registry could not be loaded.';return['registry'=>[],'source'=>'none','warnings'=>$warnings];}protected function fetchRemote(array&$warnings):?array{$context=stream_context_create(['http'=>['timeout'=>self::TIMEOUT,'ignore_errors'=>true,'user_agent'=>'Adobe-Commerce-PatchStatus/'.\Magento\PatchStatus\PatchStatusCommand::VERSION,],'ssl'=>['verify_peer'=>true,'verify_peer_name'=>true,],]);$override=getenv('PATCH_REGISTRY_URL');if($override!==false&&trim($override)!==''){$override=trim($override);if(!UrlValidator::isValid($override)){throw new \InvalidArgumentException('Environment variable PATCH_REGISTRY_URL contains an invalid URL (must be https).');}$url=$override;}else{$url=self::REMOTE_URL;}$raw=@file_get_contents($url,context:$context);if($raw===false){return null;}$status=$this->parseHttpStatus($http_response_header??[]);if($status>=400){$warnings[]=sprintf('Remote registry fetch failed (HTTP %d). Check PATCH_REGISTRY_URL (if set) and network connectivity.',$status,);return null;}$data=json_decode($raw,true);if(!is_array($data)){$warnings[]='Remote registry response was not valid JSON; ignoring.';return null;}return $data;}private function parseHttpStatus(array $responseHeaders):int{$status=0;foreach($responseHeaders as $header){if(preg_match('#^HTTP/\S+ (\d{3})#',$header,$m)){$status=(int)$m[1];}}return $status;}private function readCache(string $path):?array{if(!file_exists($path)){return null;}$raw=@file_get_contents($path);if($raw===false){return null;}$data=json_decode($raw,true);return is_array($data)?$data:null;}private function writeCache(string $path,array $data):void{$dir=dirname($path);if(!is_dir($dir)){@mkdir($dir,0775,true);}@file_put_contents($path,json_encode($data),LOCK_EX);}private function cacheAge(string $path):int{$mtime=@filemtime($path);return $mtime!==false?(time()-$mtime):PHP_INT_MAX;}}namespace Magento\PatchStatus\Resolver;final class PatchResolver{public function __construct(private readonly array $registry){}public function getApplicableIds(array $componentVersions,array $installedAreas):array{$assumeAll=empty($installedAreas)||empty($componentVersions);return array_keys($this->applicablePatches($componentVersions,$installedAreas,$assumeAll));}public function resolve(array $appliedIds,array $componentVersions,array $installedAreas=[]):array{$warnings=[];$assumeAll=empty($installedAreas)||empty($componentVersions);if($assumeAll){$warnings[]='Installed components could not be detected; all patches treated as applicable. Results may include patches irrelevant to this installation.';}$applicable=$this->applicablePatches($componentVersions,$installedAreas,$assumeAll);if(empty($applicable)){$versionsStr=implode(', ',array_map(fn($a,$v)=>"{$a}={$v}",array_keys($componentVersions),array_values($componentVersions)));$warnings[]="No patches found in registry for installed component versions ({$versionsStr})";return['missing'=>[],'warnings'=>$warnings,];}$appliedSet=array_flip($appliedIds);$missing=[];foreach($applicable as $patchId=>$patch){if(!isset($appliedSet[$patchId])){$missing[]=$patchId;}}return['missing'=>$missing,'warnings'=>$warnings,];}private function applicablePatches(array $componentVersions,array $installedAreas,bool $assumeAll):array{$areaSet=$assumeAll?null:array_flip($installedAreas);$result=[];foreach($this->registry['patches']??[]as $patchId=>$patch){if($assumeAll){$result[$patchId]=$patch;continue;}$area=$patch['area']??'';if($areaSet!==null&&!isset($areaSet[$area])){continue;}$installedVersion=$componentVersions[$area]??null;if($installedVersion===null){continue;}if(!in_array($installedVersion,$patch['applies_to']??[],true)){continue;}$result[$patchId]=$patch;}return $result;}}namespace Magento\PatchStatus\Resolver;final class CveResolver{public function __construct(private readonly array $registry){}public function resolve(array $appliedIds,array $missingIds=[],array $installedAreas=[],array $componentVersions=[],array $unknownIds=[],array $notApplicableIds=[],):array{$appliedSet=array_flip($appliedIds);$unknownSet=array_flip($unknownIds);$notApplicableSet=array_flip($notApplicableIds);$areaSet=!empty($installedAreas)?array_flip($installedAreas):null;$byCve=[];foreach($this->registry['patches']??[]as $patchId=>$patch){$patchArea=$patch['area']??'CE';if(!empty($componentVersions)){$areaIsInstalled=$areaSet===null||isset($areaSet[$patchArea]);if($areaIsInstalled){$installedVersion=$componentVersions[$patchArea]??null;if($installedVersion===null||!in_array($installedVersion,$patch['applies_to']??[],true)){continue;}}}if(isset($appliedSet[$patchId])){$patchStatus='PROTECTED';}elseif($areaSet!==null&&!isset($areaSet[$patchArea])){$patchStatus='NOT_APPLICABLE';}elseif(isset($notApplicableSet[$patchId])){$patchStatus='NOT_APPLICABLE';}elseif(isset($unknownSet[$patchId])){$patchStatus='UNKNOWN';}else{$patchStatus='VULNERABLE';}foreach($patch['cves']??[]as $cve){$byCve[$cve][$patchStatus]=true;}}$status=[];foreach($byCve as $cve=>$statuses){$status[$cve]=['status'=>match(true){isset($statuses['VULNERABLE'])=>'VULNERABLE',isset($statuses['UNKNOWN'])=>'UNKNOWN',isset($statuses['PROTECTED'])=>'PROTECTED',default=>'NOT_APPLICABLE',},];}ksort($status);return $status;}}namespace Magento\PatchStatus\Formatter;use Magento\PatchStatus\Model\PatchStatus;final class JsonFormatter{public function format(PatchStatus $status):string{return json_encode($status->toArray(),JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)."\n";}}namespace Magento\PatchStatus\Formatter;use Magento\PatchStatus\Model\PatchStatus;final class CsvFormatter{private const HEADERS=['base_version','installed_components','applied_patches','missing_patches','unknown_patches','cve','cve_status',];public function format(PatchStatus $status):string{$buf=fopen('php://temp','r+');fputcsv($buf,self::HEADERS,separator:',',enclosure:'"',escape:'\\');$common=[$status->baseVersion,implode(';',array_map(static fn($area,$ver)=>"{$area}:{$ver}",array_keys($status->installedComponents),$status->installedComponents,)),implode(';',$status->appliedPatches),implode(';',$status->missingPatches),implode(';',$status->unknownPatches),];if(empty($status->vulnerabilityStatus)){fputcsv($buf,array_merge($common,['','']),separator:',',enclosure:'"',escape:'\\');}else{foreach($status->vulnerabilityStatus as $cve=>$info){fputcsv($buf,array_merge($common,[$cve,$info['status'],]),separator:',',enclosure:'"',escape:'\\');}}rewind($buf);$content=stream_get_contents($buf);fclose($buf);return $content;}}namespace Magento\PatchStatus;use Magento\PatchStatus\Credential\ComposerCredentialResolver;use Magento\PatchStatus\Detector\ComposerDetector;use Magento\PatchStatus\Detector\DryRunDetector;use Magento\PatchStatus\Fetcher\PatchFetcher;use Magento\PatchStatus\Formatter\CsvFormatter;use Magento\PatchStatus\Formatter\JsonFormatter;use Magento\PatchStatus\Model\PatchStatus;use Magento\PatchStatus\Registry\RegistryLoader;use Magento\PatchStatus\Resolver\CveResolver;use Magento\PatchStatus\Resolver\PatchResolver;use Magento\PatchStatus\Util\UrlValidator;class PatchStatusCommand{public const VERSION='1.0.2';private const LOG_FILE='var/log/patch_status.log';private string $root='.';private string $format='json';private bool $noCache=false;public function run(array $argv):int{try{return $this->doRun($argv);}catch(\InvalidArgumentException $e){$this->error($e->getMessage());return 1;}}private function doRun(array $argv):int{$this->parseArgs($argv);$loaded=$this->makeRegistryLoader($this->root,forceRefresh:$this->noCache)->load();$warnings=$loaded['warnings'];$registry=$loaded['registry'];if(empty($registry)){foreach($warnings as $warning){$this->error($warning);}if(empty($warnings)){$this->error('Cannot load patch registry');}return 1;}$comp=(new ComposerDetector($this->root))->detect();$warnings=array_merge($warnings,$comp['warnings']);$baseVersion=$comp['base_version']??'unknown';$replacedVendorPrefixes=array_map(static fn(string $pkg):string=>'vendor/'.trim($pkg,'/').'/',$comp['replaced_packages']??[],);$areaDefinitions=$registry['_areas']??[];$installedAreas=[];$componentVersions=[];foreach($areaDefinitions as $area=>$def){if(($def['detection']??'')==='base_version'){if($baseVersion!=='unknown'){$installedAreas[]=$area;$componentVersions[$area]=$baseVersion;}}elseif(isset($def['composer_package'])){$pkg=$def['composer_package'];if(isset($comp['installed_packages'][$pkg])){$installedAreas[]=$area;$componentVersions[$area]=ltrim($comp['installed_packages'][$pkg],'v');}}}if($baseVersion==='unknown'){$status=new PatchStatus(baseVersion:'unknown',appliedPatches:[],missingPatches:[],installedComponents:[],vulnerabilityStatus:[],warnings:array_values(array_unique($warnings)),registrySource:$loaded['source'],);echo match($this->format){'csv'=>(new CsvFormatter())->format($status),default=>(new JsonFormatter())->format($status),};return 1;}if(!$this->isPatchBinaryAvailable()){$this->error('patch(1) binary not found. Install the patch utility and try again.');return 1;}$patchResolver=new PatchResolver($registry);$applicableIds=$patchResolver->getApplicableIds($componentVersions,$installedAreas);if(empty($applicableIds)){$versionsStr=implode(', ',array_map(fn($a,$v)=>"{$a}={$v}",array_keys($componentVersions),array_values($componentVersions),));$warnings[]="No patches found in registry for installed component versions ({$versionsStr})";}try{$detected=$this->runDryRunDetection($applicableIds,$registry,$replacedVendorPrefixes);}catch(\RuntimeException $e){$this->error($e->getMessage());return 1;}$warnings=array_merge($warnings,$detected['warnings']);$unknownLogs=$detected['unknown_logs'];$appliedPatches=[];$missingPatches=[];$unknownPatches=[];$notApplicableIds=[];foreach($detected['statuses']as $patchId=>$patchStatus){match($patchStatus){'applied'=>$appliedPatches[]=$patchId,'not_applied'=>$missingPatches[]=$patchId,'unknown'=>$unknownPatches[]=$patchId,'not_applicable'=>$notApplicableIds[]=$patchId,default=>null,};}$cveResolver=new CveResolver($registry);$vulnStatus=$cveResolver->resolve($appliedPatches,$missingPatches,$installedAreas,$componentVersions,$unknownPatches,$notApplicableIds,);$status=new PatchStatus(baseVersion:$baseVersion,appliedPatches:array_values($appliedPatches),missingPatches:array_values($missingPatches),installedComponents:$componentVersions,vulnerabilityStatus:$vulnStatus,warnings:array_values(array_unique($warnings)),registrySource:$loaded['source'],unknownPatches:array_values($unknownPatches),);$output=match($this->format){'csv'=>(new CsvFormatter())->format($status),default=>(new JsonFormatter())->format($status),};echo $output;$this->writeLog($status,$unknownLogs);return 0;}protected function makeRegistryLoader(string $magentoRoot,bool $forceRefresh):RegistryLoader{return new RegistryLoader(magentoRoot:$magentoRoot,forceRefresh:$forceRefresh);}protected function isPatchBinaryAvailable():bool{return DryRunDetector::isPatchBinaryAvailable();}protected function runDryRunDetection(array $applicableIds,array $registry,array $replacedVendorPrefixes=[]):array{$override=getenv('PATCH_DIFF_BASE_URL');if($override!==false&&trim($override)!==''){$override=trim($override);if(!UrlValidator::isValid($override)){throw new \InvalidArgumentException('Environment variable PATCH_DIFF_BASE_URL contains an invalid URL (must be https).');}$baseUrl=$override;}else{$baseUrl=PatchFetcher::DIFF_BASE_URL;}$needsAuth=false;foreach($applicableIds as $id){if(!empty($registry['patches'][$id]['entitlements']??[])){$needsAuth=true;break;}}$credentials=null;if($needsAuth){$host=(string)(parse_url($baseUrl,PHP_URL_HOST)??'');$credentials=(new ComposerCredentialResolver())->resolve($this->root,$host);}$fetcher=new PatchFetcher($this->root,$baseUrl,$credentials,noCache:$this->noCache);$detector=new DryRunDetector($this->root,$registry,$fetcher,$replacedVendorPrefixes);return $detector->detect($applicableIds);}private function parseArgs(array $argv):void{foreach(array_slice($argv,1)as $arg){if(preg_match('/^--root=(.+)$/',$arg,$m)){$this->root=rtrim($m[1],'/');}elseif(preg_match('/^--format=(json|csv)$/',$arg,$m)){$this->format=$m[1];}elseif($arg==='--no-cache'){$this->noCache=true;}elseif(in_array($arg,['--version','-V'],true)){echo'patch-status '.self::VERSION."\n";exit(0);}elseif(in_array($arg,['--help','-h'],true)){$this->printUsage();exit(0);}}}private function printUsage():void{$version=self::VERSION;echo"Adobe Commerce Monthly Security Release Versioning Tool v{$version}\n\n"."Usage:\n"."  vendor/bin/patch-status [OPTIONS]\n\n"."Options:\n"."  --root=PATH           Path to Commerce installation root (default: current directory)\n"."  --format=FORMAT       Output format: json (default) or csv\n"."  --no-cache            Bypass all local caches (registry and patch diffs); force fresh fetches from remote; exits with an error if the remote registry is unreachable\n"."  --version             Show version\n"."  --help                Show this help message\n\n"."Note: Output format is not final and may change in future releases.\n\n";}private function writeLog(PatchStatus $status,array $unknownLogs):void{$logPath=rtrim($this->root,'/').'/'.self::LOG_FILE;$logDir=dirname($logPath);if(!is_dir($logDir)&&!@mkdir($logDir,0775,true)){return;}$line=sprintf("[%s] base=%s applied=[%s] missing=[%s] unknown=[%s]\n",date('c'),$status->baseVersion,implode(',',$status->appliedPatches),implode(',',$status->missingPatches),implode(',',$status->unknownPatches),);@file_put_contents($logPath,$line,FILE_APPEND|LOCK_EX);foreach($unknownLogs as $patchId=>$logOutput){$block=sprintf("[%s] UNKNOWN %s:\n%s\n",date('c'),$patchId,$logOutput);@file_put_contents($logPath,$block,FILE_APPEND|LOCK_EX);}}private function error(string $msg):void{fwrite(STDERR,"patch-status: {$msg}\n");}}
++$command=new PatchStatusCommand();exit($command->run($argv));

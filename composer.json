@@ -119,6 +119,46 @@
                         "magento/module-customer": "103.0.9",
                         "magento/module-store": "101.1.9"
                     }
+                },
+                "2026-08-001 Isolated (CE, base 2.4.6-p15)": {
+                    "source": "patches/isolated/246p15-2026-08-001-CE.patch",
+                    "cwd": "project",
+                    "depends": {
+                        "magento/magento2-base": "2.4.6-p15",
+                        "magento/module-cms": "104.0.6-p14",
+                        "magento/module-customer": "103.0.6-p15",
+                        "magento/module-review": "100.4.6-p15"
+                    }
+                },
+                "2026-08-001 Isolated (CE, base 2.4.7-p10)": {
+                    "source": "patches/isolated/247p10-2026-08-001-CE.patch",
+                    "cwd": "project",
+                    "depends": {
+                        "magento/magento2-base": "2.4.7-p10",
+                        "magento/module-cms": "104.0.7-p9",
+                        "magento/module-customer": "103.0.7-p10",
+                        "magento/module-review": "100.4.7-p10"
+                    }
+                },
+                "2026-08-001 Isolated (CE, base 2.4.8-p5)": {
+                    "source": "patches/isolated/248p5-2026-08-001-CE.patch",
+                    "cwd": "project",
+                    "depends": {
+                        "magento/magento2-base": "2.4.8-p5",
+                        "magento/module-cms": "104.0.8-p5",
+                        "magento/module-customer": "103.0.8-p5",
+                        "magento/module-review": "100.4.8-p5"
+                    }
+                },
+                "2026-08-001 Isolated (CE, base 2.4.9)": {
+                    "source": "patches/isolated/249-2026-08-001-CE.patch",
+                    "cwd": "project",
+                    "depends": {
+                        "magento/magento2-base": "2.4.9",
+                        "magento/module-cms": "104.0.9",
+                        "magento/module-customer": "103.0.9",
+                        "magento/module-review": "100.4.9"
+                    }
                 }
             }
         }

@@ -38,6 +38,7 @@ These patches address critical vulnerabilities out of band security issues that 
 - **CVE-2024-34102** - CosmicSting vulnerability affecting Magento 2.4.7 and earlier
 - **CVE-2025-54236** - Session security vulnerability
 - **APSB25-94** - Polyshell vulnerability affecting Magento 2.4.9-alpha2 and earlier
+- **APSB26-146 (VULN-39341, StyleSmuggler)** - CVE-2026-75650, unauthenticated RCE via GraphQL style property injection into admin email preview/reminder rendering, actively exploited. Critical (CVSS 10.0). Affects 2.4.6-2.4.9; one patch per base version, base 2.4.4/2.4.5 not covered by this package.
 
 For detailed information on each patch, see the patches in [src/patches/emergency/](src/patches/emergency/).
 

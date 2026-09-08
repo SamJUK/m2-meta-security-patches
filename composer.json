@@ -53,6 +53,50 @@
                         "magento/framework": "< 103.0.9 || 103.0.9-alpha1 || 103.0.9-alpha2"
                     }
                 },
+                "APSB26-146 (StyleSmuggler, base 2.4.6-p15)": {
+                    "source": "patches/emergency/VULN-39341-246p15.patch",
+                    "cwd": "project",
+                    "depends": {
+                        "magento/magento2-base": "2.4.6-p15",
+                        "magento/framework": "103.0.6-p15",
+                        "magento/module-backend": "102.0.6-p15",
+                        "magento/module-email": "101.1.6-p14",
+                        "magento/module-newsletter": "100.4.6-p14"
+                    }
+                },
+                "APSB26-146 (StyleSmuggler, base 2.4.7-p10)": {
+                    "source": "patches/emergency/VULN-39341-247p10.patch",
+                    "cwd": "project",
+                    "depends": {
+                        "magento/magento2-base": "2.4.7-p10",
+                        "magento/framework": "103.0.7-p10",
+                        "magento/module-backend": "102.0.7-p10",
+                        "magento/module-email": "101.1.7-p9",
+                        "magento/module-newsletter": "100.4.7-p9"
+                    }
+                },
+                "APSB26-146 (StyleSmuggler, base 2.4.8-p5)": {
+                    "source": "patches/emergency/VULN-39341-248p5.patch",
+                    "cwd": "project",
+                    "depends": {
+                        "magento/magento2-base": "2.4.8-p5",
+                        "magento/framework": "103.0.8-p5",
+                        "magento/module-backend": "102.0.8-p5",
+                        "magento/module-email": "101.1.8-p4",
+                        "magento/module-newsletter": "100.4.8-p4"
+                    }
+                },
+                "APSB26-146 (StyleSmuggler, base 2.4.9)": {
+                    "source": "patches/emergency/VULN-39341-249.patch",
+                    "cwd": "project",
+                    "depends": {
+                        "magento/magento2-base": "2.4.9",
+                        "magento/framework": "103.0.9",
+                        "magento/module-backend": "102.0.9",
+                        "magento/module-email": "101.1.9",
+                        "magento/module-newsletter": "100.4.9"
+                    }
+                },
                 "2026-07-001 Isolated (CE, base 2.4.6-p15)": {
                     "source": "patches/isolated/246p15-2026-07-001-CE.patch",
                     "cwd": "project",

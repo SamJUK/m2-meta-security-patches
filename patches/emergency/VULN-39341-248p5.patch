@@ -1,0 +1,304 @@
+diff --git a/vendor/magento/module-backend/Model/Widget/Grid/Row/UrlGeneratorFactory.php b/vendor/magento/module-backend/Model/Widget/Grid/Row/UrlGeneratorFactory.php
+index 93ba6284c7ac8..d273d19a633a3 100644
+--- a/vendor/magento/module-backend/Model/Widget/Grid/Row/UrlGeneratorFactory.php
++++ b/vendor/magento/module-backend/Model/Widget/Grid/Row/UrlGeneratorFactory.php
+@@ -36,11 +36,11 @@ public function __construct(\Magento\Framework\ObjectManagerInterface $objectMan
+      */
+     public function createUrlGenerator($generatorClassName, array $arguments = [])
+     {
+-        $rowUrlGenerator = $this->_objectManager->create($generatorClassName, $arguments);
+-        if (false === $rowUrlGenerator instanceof \Magento\Backend\Model\Widget\Grid\Row\GeneratorInterface) {
++        // Validate the type BEFORE instantiation.
++        if (!is_a($generatorClassName, \Magento\Backend\Model\Widget\Grid\Row\GeneratorInterface::class, true)) {
+             throw new \InvalidArgumentException('Passed wrong parameters');
+         }
+ 
+-        return $rowUrlGenerator;
++        return $this->_objectManager->create($generatorClassName, $arguments);
+     }
+ }
+diff --git a/vendor/magento/module-email/Block/Adminhtml/Template/Preview.php b/vendor/magento/module-email/Block/Adminhtml/Template/Preview.php
+index d2fdcb8e315fe..b9f090a69adac 100644
+--- a/vendor/magento/module-email/Block/Adminhtml/Template/Preview.php
++++ b/vendor/magento/module-email/Block/Adminhtml/Template/Preview.php
+@@ -15,6 +15,11 @@
+  */
+ class Preview extends \Magento\Backend\Block\Widget
+ {
++    /**
++     * @var string
++     */
++    private const ADMIN_RESOURCE = 'Magento_Email::template';
++
+     /**
+      * @var \Magento\Framework\Filter\Input\MaliciousCode
+      */
+@@ -55,6 +60,10 @@ public function __construct(
+      */
+     protected function _toHtml()
+     {
++        if (!$this->_authorization->isAllowed(self::ADMIN_RESOURCE)) {
++            return '';
++        }
++
+         $request = $this->getRequest();
+ 
+         $storeId = $this->getAnyStoreView()->getId();
+diff --git a/vendor/magento/module-email/Model/AbstractTemplate.php b/vendor/magento/module-email/Model/AbstractTemplate.php
+index 7c5c973c60555..7e1456859ddfe 100644
+--- a/vendor/magento/module-email/Model/AbstractTemplate.php
++++ b/vendor/magento/module-email/Model/AbstractTemplate.php
+@@ -761,6 +761,32 @@ public function getUrl(Store $store, $route = '', $params = [])
+         return $url->getUrl($route, $params);
+     }
+ 
++    /**
++     * Set template text
++     *
++     * Rejects non-string input
++     *
++     * @param mixed $value
++     * @return $this
++     */
++    public function setTemplateText($value)
++    {
++        return $this->setData('template_text', is_string($value) ? $value : '');
++    }
++
++    /**
++     * Set template styles
++     *
++     * Rejects non-string input
++     *
++     * @param mixed $value
++     * @return $this
++     */
++    public function setTemplateStyles($value)
++    {
++        return $this->setData('template_styles', is_string($value) ? $value : '');
++    }
++
+     /**
+      * Validate template code
+      *
+diff --git a/vendor/magento/module-newsletter/Block/Adminhtml/Queue/Preview.php b/vendor/magento/module-newsletter/Block/Adminhtml/Queue/Preview.php
+index 269d973d5534e..916ad4f5576c8 100644
+--- a/vendor/magento/module-newsletter/Block/Adminhtml/Queue/Preview.php
++++ b/vendor/magento/module-newsletter/Block/Adminhtml/Queue/Preview.php
+@@ -13,6 +13,11 @@
+  */
+ class Preview extends \Magento\Newsletter\Block\Adminhtml\Template\Preview
+ {
++    /**
++     * @var string
++     */
++    protected const ADMIN_RESOURCE = 'Magento_Newsletter::queue';
++
+     /**
+      * @var string
+      */
+diff --git a/vendor/magento/module-newsletter/Block/Adminhtml/Template/Preview.php b/vendor/magento/module-newsletter/Block/Adminhtml/Template/Preview.php
+index 7d6c3b8a8e499..3838e24c6f223 100644
+--- a/vendor/magento/module-newsletter/Block/Adminhtml/Template/Preview.php
++++ b/vendor/magento/module-newsletter/Block/Adminhtml/Template/Preview.php
+@@ -24,6 +24,11 @@
+  */
+ class Preview extends Widget
+ {
++    /**
++     * @var string
++     */
++    protected const ADMIN_RESOURCE = 'Magento_Newsletter::template';
++
+     /**
+      * Name for profiler
+      *
+@@ -74,6 +79,10 @@ public function __construct(
+      */
+     protected function _toHtml()
+     {
++        if (!$this->_authorization->isAllowed(static::ADMIN_RESOURCE)) {
++            return '';
++        }
++
+         /* @var $template \Magento\Newsletter\Model\Template */
+         $template = $this->_templateFactory->create();
+ 
+diff --git a/vendor/magento/framework/View/Element/BlockFactory.php b/vendor/magento/framework/View/Element/BlockFactory.php
+index a690d6aed0dfb..84625089fa9a1 100644
+--- a/vendor/magento/framework/View/Element/BlockFactory.php
++++ b/vendor/magento/framework/View/Element/BlockFactory.php
+@@ -5,6 +5,7 @@
+  */
+ namespace Magento\Framework\View\Element;
+ 
++use Magento\Framework\ObjectManager\ConfigInterface;
+ use Magento\Framework\ObjectManagerInterface;
+ 
+ /**
+@@ -20,14 +21,24 @@ class BlockFactory
+      */
+     protected $objectManager;
+ 
++    /**
++     * @var ConfigInterface
++     */
++    private $objectManagerConfig;
++
+     /**
+      * Constructor
+      *
+      * @param ObjectManagerInterface $objectManager
++     * @param ConfigInterface|null $objectManagerConfig
+      */
+-    public function __construct(ObjectManagerInterface $objectManager)
+-    {
++    public function __construct(
++        ObjectManagerInterface $objectManager,
++        ?ConfigInterface $objectManagerConfig = null
++    ) {
+         $this->objectManager = $objectManager;
++        $this->objectManagerConfig = $objectManagerConfig ?:
++            \Magento\Framework\App\ObjectManager::getInstance()->get(ConfigInterface::class);
+     }
+ 
+     /**
+@@ -41,10 +52,13 @@ public function __construct(ObjectManagerInterface $objectManager)
+     public function createBlock($blockName, array $arguments = [])
+     {
+         $blockName = ltrim($blockName, '\\');
+-        $block = $this->objectManager->create($blockName, $arguments);
+-        if (!$block instanceof BlockInterface) {
++        $resolvedType = $this->objectManagerConfig->getInstanceType(
++            $this->objectManagerConfig->getPreference($blockName)
++        );
++        if (!is_a($resolvedType, BlockInterface::class, true)) {
+             throw new \LogicException($blockName . ' does not implement BlockInterface');
+         }
++        $block = $this->objectManager->create($blockName, $arguments);
+         if ($block instanceof Template) {
+             $block->setTemplateContext($block);
+         }
+diff --git a/vendor/magento/framework/View/Layout/Generator/Block.php b/vendor/magento/framework/View/Layout/Generator/Block.php
+index 98cf78784070e..adfad96cd411f 100644
+--- a/vendor/magento/framework/View/Layout/Generator/Block.php
++++ b/vendor/magento/framework/View/Layout/Generator/Block.php
+@@ -270,7 +270,7 @@ protected function getBlockInstance($block, array $arguments = [])
+         if ($block && is_string($block)) {
+             try {
+                 $block = $this->blockFactory->createBlock($block, $arguments);
+-            } catch (\ReflectionException $e) {
++            } catch (\ReflectionException | \LogicException $e) {
+                 $this->logger->critical($e->getMessage());
+             }
+         }
+diff --git a/vendor/magento/framework/Webapi/ErrorProcessor.php b/vendor/magento/framework/Webapi/ErrorProcessor.php
+index c0327e4a6d406..ebd374d463df1 100644
+--- a/vendor/magento/framework/Webapi/ErrorProcessor.php
++++ b/vendor/magento/framework/Webapi/ErrorProcessor.php
+@@ -43,6 +43,11 @@ class ErrorProcessor
+ 
+     public const DATA_FORMAT_XML = 'xml';
+ 
++    /**
++     * @var string
++     */
++    private const REPORT_EXECUTION_GUARD = '<?php exit; ?>';
++
+     /**
+      * @var \Magento\Framework\Json\Encoder $encoder
+      */
+@@ -322,7 +327,13 @@ protected function _saveFatalErrorReport($reportData)
+     {
+         $this->directoryWrite->create('report/api');
+         $reportId = abs((int)(microtime(true) * random_int(100, 1000)));
+-        $this->directoryWrite->writeFile('report/api/' . $reportId, $this->serializer->serialize($reportData));
++        if (is_string($reportData)) {
++            $reportData = str_replace('<?', '< ?', $reportData);
++        }
++        $this->directoryWrite->writeFile(
++            'report/api/' . $reportId,
++            self::REPORT_EXECUTION_GUARD . PHP_EOL . $this->serializer->serialize($reportData)
++        );
+         return $reportId;
+     }
+ }
+diff --git a/vendor/magento/magento2-base/pub/errors/processor.php b/vendor/magento/magento2-base/pub/errors/processor.php
+index 8cb386e1fc67d..3f86886485f57 100644
+--- a/vendor/magento/magento2-base/pub/errors/processor.php
++++ b/vendor/magento/magento2-base/pub/errors/processor.php
+@@ -28,6 +28,11 @@ class Processor
+     public const ERROR_DIR = 'pub/errors';
+     public const NUMBER_SYMBOLS_IN_SUBDIR_NAME = 2;
+ 
++    /**
++     * @var string
++     */
++    private const REPORT_EXECUTION_GUARD = '<?php exit; ?>';
++
+     /**
+      * Page title
+      *
+@@ -530,7 +535,11 @@ public function saveReport(array $reportData): string
+         }
+         $this->_setReportData($reportData);
+ 
+-        @file_put_contents($this->_reportFile, $this->serializer->serialize($reportData). PHP_EOL);
++        $reportData = $this->sanitizeReportData($reportData);
++        @file_put_contents(
++            $this->_reportFile,
++            self::REPORT_EXECUTION_GUARD . PHP_EOL . $this->serializer->serialize($reportData) . PHP_EOL
++        );
+ 
+         if (isset($reportData['skin']) && self::DEFAULT_SKIN != $reportData['skin']) {
+             $this->_setSkin($reportData['skin']);
+@@ -540,6 +549,38 @@ public function saveReport(array $reportData): string
+         return $this->reportUrl;
+     }
+ 
++    /**
++     * Neutralize PHP open tags inside report values.
++     *
++     * @param array $data
++     * @return array
++     */
++    private function sanitizeReportData(array $data): array
++    {
++        array_walk_recursive($data, static function (&$value) {
++            if (is_string($value)) {
++                $value = str_replace('<?', '< ?', $value);
++            }
++        });
++        return $data;
++    }
++
++    /**
++     * Read a report file, stripping the execution-guard prefix when present.
++     *
++     * @param string $reportFile
++     * @return string
++     */
++    private function readReportFile(string $reportFile): string
++    {
++        $contents = (string)file_get_contents($reportFile);
++        $guard = self::REPORT_EXECUTION_GUARD;
++        if (strncmp($contents, $guard, strlen($guard)) === 0) {
++            $contents = ltrim(substr($contents, strlen($guard)), "\r\n");
++        }
++        return $contents;
++    }
++
+     /**
+      * Get report
+      *
+@@ -558,7 +599,9 @@ public function loadReport($reportId)
+             }
+             $this->reportId = $reportId;
+             $this->_reportFile = $reportFile;
+-            $this->_setReportData($this->serializer->unserialize(file_get_contents($this->_reportFile)));
++            $this->_setReportData(
++                $this->serializer->unserialize($this->readReportFile($this->_reportFile))
++            );
+         } catch (\RuntimeException $e) {
+             $this->redirectToBaseUrl();
+         }

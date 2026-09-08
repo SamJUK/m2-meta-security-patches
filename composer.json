@@ -203,6 +203,62 @@
                         "magento/module-customer": "103.0.9",
                         "magento/module-review": "100.4.9"
                     }
+                },
+                "2026-09-001 Isolated (CE, base 2.4.6-p15)": {
+                    "source": "patches/isolated/246p15-2026-09-001-CE.patch",
+                    "cwd": "project",
+                    "depends": {
+                        "magento/framework": "103.0.6-p15",
+                        "magento/module-backup": "100.4.6",
+                        "magento/module-customer": "103.0.6-p15",
+                        "magento/module-customer-graph-ql": "100.4.6",
+                        "magento/module-import-export": "101.0.6-p13",
+                        "magento/module-instant-purchase": "100.4.5-p8",
+                        "magento/module-paypal": "101.0.6-p15",
+                        "magento/module-sales": "103.0.6-p15"
+                    }
+                },
+                "2026-09-001 Isolated (CE, base 2.4.7-p10)": {
+                    "source": "patches/isolated/247p10-2026-09-001-CE.patch",
+                    "cwd": "project",
+                    "depends": {
+                        "magento/framework": "103.0.7-p10",
+                        "magento/module-backup": "100.4.7",
+                        "magento/module-customer": "103.0.7-p10",
+                        "magento/module-customer-graph-ql": "100.4.7",
+                        "magento/module-import-export": "101.0.7-p8",
+                        "magento/module-instant-purchase": "100.4.6-p3",
+                        "magento/module-paypal": "101.0.7-p10",
+                        "magento/module-sales": "103.0.7-p8"
+                    }
+                },
+                "2026-09-001 Isolated (CE, base 2.4.8-p5)": {
+                    "source": "patches/isolated/248p5-2026-09-001-CE.patch",
+                    "cwd": "project",
+                    "depends": {
+                        "magento/framework": "103.0.8-p5",
+                        "magento/module-backup": "100.4.8",
+                        "magento/module-customer": "103.0.8-p5",
+                        "magento/module-customer-graph-ql": "100.4.8-p1",
+                        "magento/module-import-export": "101.0.8-p3",
+                        "magento/module-instant-purchase": "100.4.7",
+                        "magento/module-paypal": "101.0.8-p5",
+                        "magento/module-sales": "103.0.8-p5"
+                    }
+                },
+                "2026-09-001 Isolated (CE, base 2.4.9)": {
+                    "source": "patches/isolated/249-2026-09-001-CE.patch",
+                    "cwd": "project",
+                    "depends": {
+                        "magento/framework": "103.0.9",
+                        "magento/module-backup": "100.4.9",
+                        "magento/module-customer": "103.0.9",
+                        "magento/module-customer-graph-ql": "100.4.9",
+                        "magento/module-import-export": "101.0.9",
+                        "magento/module-instant-purchase": "100.4.8",
+                        "magento/module-paypal": "101.0.9",
+                        "magento/module-sales": "103.0.9"
+                    }
                 }
             }
         }

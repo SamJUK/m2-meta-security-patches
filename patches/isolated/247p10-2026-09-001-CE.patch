@@ -1,0 +1,306 @@
+diff --git a/vendor/magento/module-backup/Controller/Adminhtml/Index/Rollback.php b/vendor/magento/module-backup/Controller/Adminhtml/Index/Rollback.php
+index 91152bf51f026..1930ae2a184e9 100644
+--- a/vendor/magento/module-backup/Controller/Adminhtml/Index/Rollback.php
++++ b/vendor/magento/module-backup/Controller/Adminhtml/Index/Rollback.php
+@@ -17,6 +17,11 @@
+  */
+ class Rollback extends \Magento\Backup\Controller\Adminhtml\Index implements HttpPostActionInterface
+ {
++    /**
++     * @see _isAllowed()
++     */
++    public const ADMIN_RESOURCE = 'Magento_Backup::rollback';
++
+     /**
+      * Rollback Action
+      *
+@@ -27,10 +32,6 @@ class Rollback extends \Magento\Backup\Controller\Adminhtml\Index implements Htt
+      */
+     public function execute()
+     {
+-        if (!$this->_objectManager->get(\Magento\Backup\Helper\Data::class)->isRollbackAllowed()) {
+-            $this->_forward('denied');
+-        }
+-
+         if (!$this->getRequest()->isAjax()) {
+             return $this->_redirect('*/*/index');
+         }
+diff --git a/vendor/magento/module-customer/i18n/en_US.csv b/vendor/magento/module-customer/i18n/en_US.csv
+index b4054e1eb32a5..095e41ae851a1 100644
+--- a/vendor/magento/module-customer/i18n/en_US.csv
++++ b/vendor/magento/module-customer/i18n/en_US.csv
+@@ -548,3 +548,4 @@ Addresses,Addresses
+ "Full Match","Full Match"
+ "Prefix Match","Prefix Match"
+ "Something went wrong while logging out customer.","Something went wrong while logging out customer."
++"Address not found.","Address not found."
+diff --git a/vendor/magento/module-customer-graph-ql/Model/Context/AddUserInfoToContext.php b/vendor/magento/module-customer-graph-ql/Model/Context/AddUserInfoToContext.php
+index de447a9b8c976..145a098fb5e94 100644
+--- a/vendor/magento/module-customer-graph-ql/Model/Context/AddUserInfoToContext.php
++++ b/vendor/magento/module-customer-graph-ql/Model/Context/AddUserInfoToContext.php
+@@ -14,6 +14,11 @@
+ use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
+ use Magento\GraphQl\Model\Query\ContextParametersInterface;
+ use Magento\GraphQl\Model\Query\UserContextParametersProcessorInterface;
++use Magento\Framework\App\ObjectManager;
++use Magento\Framework\App\Request\Http as HttpRequest;
++use Magento\Store\Api\Data\StoreInterface;
++use Magento\Store\Model\StoreManagerInterface;
++use Magento\Customer\Model\Config\Share;
+ 
+ /**
+  * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
+@@ -40,20 +45,44 @@ class AddUserInfoToContext implements UserContextParametersProcessorInterface, R
+      */
+     private $customerRepository;
+ 
++    /**
++     * @var Share
++     */
++    private $configShare;
++
++    /**
++     * @var StoreManagerInterface
++     */
++    private $storeManager;
++
++    /**
++     * @var HttpRequest
++     */
++    private $request;
++
+     /**
+      * @param UserContextInterface $userContext
+      * @param Session $session
+      * @param CustomerRepository $customerRepository
++     * @param Share|null $configShare
++     * @param StoreManagerInterface|null $storeManager
++     * @param HttpRequest|null $request
+      */
+     public function __construct(
+         UserContextInterface $userContext,
+         Session $session,
+-        CustomerRepository $customerRepository
++        CustomerRepository $customerRepository,
++        ?Share $configShare = null,
++        ?StoreManagerInterface $storeManager = null,
++        ?HttpRequest $request = null
+     ) {
+         $this->userContext = $userContext;
+         $this->userContextFromConstructor = $userContext;
+         $this->session = $session;
+         $this->customerRepository = $customerRepository;
++        $this->configShare = $configShare ?? ObjectManager::getInstance()->get(Share::class);
++        $this->storeManager = $storeManager ?? ObjectManager::getInstance()->get(StoreManagerInterface::class);
++        $this->request = $request ?? ObjectManager::getInstance()->get(HttpRequest::class);
+     }
+ 
+     /**
+@@ -92,6 +121,13 @@ public function execute(ContextParametersInterface $contextParameters): ContextP
+         $isCustomer = $this->isCustomer($currentUserId, $currentUserType);
+         $contextParameters->addExtensionAttribute('is_customer', $isCustomer);
+ 
++        if (!$isCustomer
++            && !empty($currentUserId)
++            && $currentUserType === UserContextInterface::USER_TYPE_CUSTOMER
++        ) {
++            $contextParameters->setUserId(0);
++        }
++
+         if ($isCustomer) {
+             $customer = $this->customerRepository->getById($currentUserId);
+             $this->session->setCustomerData($customer);
+@@ -119,8 +155,28 @@ public function getLoggedInCustomerData(): ?CustomerInterface
+      */
+     private function isCustomer(?int $customerId, ?int $customerType): bool
+     {
+-        return !empty($customerId)
++        $result = !empty($customerId)
+             && !empty($customerType)
+             && $customerType === UserContextInterface::USER_TYPE_CUSTOMER;
++
++        if ($result && $this->configShare->isWebsiteScope()) {
++            $customer = $this->customerRepository->getById($customerId);
++            return (int)$customer->getWebsiteId() === (int)$this->getEffectiveStore()->getWebsiteId();
++        }
++        return $result;
++    }
++
++    /**
++     * Resolve the store to use for website-scope validation.
++     *
++     * @return StoreInterface
++     */
++    private function getEffectiveStore(): StoreInterface
++    {
++        $storeCode = trim((string) $this->request->getHeader('Store'));
++        if (!empty($storeCode)) {
++            return $this->storeManager->getStore($storeCode);
++        }
++        return $this->storeManager->getStore();
+     }
+ }
+diff --git a/vendor/magento/module-import-export/Controller/Adminhtml/Export/File/Delete.php b/vendor/magento/module-import-export/Controller/Adminhtml/Export/File/Delete.php
+index 8c47412adc835..8bbc8b235e27f 100644
+--- a/vendor/magento/module-import-export/Controller/Adminhtml/Export/File/Delete.php
++++ b/vendor/magento/module-import-export/Controller/Adminhtml/Export/File/Delete.php
+@@ -72,7 +72,15 @@ public function execute()
+             }
+             $directoryWrite = $this->filesystem->getDirectoryWrite(DirectoryList::VAR_IMPORT_EXPORT);
+             try {
+-                $directoryWrite->delete($directoryWrite->getAbsolutePath() . 'export/' . $fileName);
++                $fileName = $directoryWrite->getDriver()->getRealPathSafety(DIRECTORY_SEPARATOR . $fileName);
++                $fileExist = $directoryWrite->isFile('export' . $fileName);
++                if (!$fileExist) {
++                    $this->messageManager->addErrorMessage(__(
++                        'Sorry, but the data is invalid or the file is not uploaded.'
++                    ));
++                    return $resultRedirect;
++                }
++                $directoryWrite->delete($directoryWrite->getAbsolutePath() . 'export' . $fileName);
+                 $this->messageManager->addSuccessMessage(__('File %1 deleted', $fileName));
+             } catch (ValidatorException $exception) {
+                 $this->messageManager->addErrorMessage(
+diff --git a/vendor/magento/module-instant-purchase/Model/InstantPurchaseOptionLoadingFactory.php b/vendor/magento/module-instant-purchase/Model/InstantPurchaseOptionLoadingFactory.php
+index b203cfdad2221..272254be98f9b 100644
+--- a/vendor/magento/module-instant-purchase/Model/InstantPurchaseOptionLoadingFactory.php
++++ b/vendor/magento/module-instant-purchase/Model/InstantPurchaseOptionLoadingFactory.php
+@@ -10,2 +10,3 @@
+ use Magento\Customer\Model\AddressFactory;
++use Magento\Framework\Exception\NoSuchEntityException;
+ use Magento\Quote\Api\Data\ShippingMethodInterfaceFactory;
+@@ -85,6 +86,11 @@ public function create(
+         $paymentToken = $this->paymentTokenManagement->getByPublicHash($paymentTokenPublicHash, $customerId);
+         $shippingAddress = $this->getAddress($shippingAddressId);
+         $billingAddress = $this->getAddress($billingAddressId);
++        if ((int)$shippingAddress->getCustomerId() !== $customerId ||
++            (int)$billingAddress->getCustomerId() !== $customerId) {
++            throw new NoSuchEntityException(__('Address not found.'));
++        }
++
+         $shippingMethod = $this->shippingMethodFactory->create()
+             ->setCarrierCode($carrierCode)
+             ->setMethodCode($shippingMethodCode);
+diff --git a/vendor/magento/module-paypal/Controller/Express/AbstractExpress.php b/vendor/magento/module-paypal/Controller/Express/AbstractExpress.php
+index 65426cb5f7203..0900ef30e0fb0 100644
+--- a/vendor/magento/module-paypal/Controller/Express/AbstractExpress.php
++++ b/vendor/magento/module-paypal/Controller/Express/AbstractExpress.php
+@@ -151,7 +151,7 @@ public function __construct(
+     protected function _initCheckout(CartInterface $quoteObject = null)
+     {
+         $quote = $quoteObject ? $quoteObject : $this->_getQuote();
+-        if ($quote->getId()) {
++        if ($quote->getId() && $this->isQuoteAllowedForUser($quote)) {
+             $this->_getCheckoutSession()->setPayPalQuoteId($quote->getId());
+         }
+         if (!$quote->hasItems() || $quote->getHasError()) {
+@@ -259,6 +259,22 @@ protected function _getQuote()
+         return $this->_quote;
+     }
+ 
++    /**
++     * Checks if the quote is allowed for the current user.
++     *
++     * @param CartInterface $quote
++     * @return bool
++     */
++    private function isQuoteAllowedForUser(CartInterface $quote): bool
++    {
++        if ((int)$quote->getId() === (int)$this->_getCheckoutSession()->getQuoteId()) {
++            return true;
++        }
++
++        return $this->_customerSession->isLoggedIn()
++            && (int)$quote->getCustomerId() === (int)$this->_customerSession->getCustomerId();
++    }
++
+     /**
+      * @inheritdoc
+      */
+diff --git a/vendor/magento/module-sales/view/adminhtml/web/order/create/scripts.js b/vendor/magento/module-sales/view/adminhtml/web/order/create/scripts.js
+index 91e5a72789338..62da816368c3f 100644
+--- a/vendor/magento/module-sales/view/adminhtml/web/order/create/scripts.js
++++ b/vendor/magento/module-sales/view/adminhtml/web/order/create/scripts.js
+@@ -5,6 +5,7 @@
+ 
+  define([
+     'jquery',
++    'underscore',
+     'Magento_Ui/js/modal/confirm',
+     'Magento_Ui/js/modal/alert',
+     'mage/template',
+@@ -14,7 +15,7 @@
+     'prototype',
+     'Magento_Catalog/catalog/product/composite/configure',
+     'Magento_Ui/js/lib/view/utils/async'
+-], function (jQuery, confirm, alert, template, shippingTemplate, paymentTemplate) {
++], function (jQuery, _, confirm, alert, template, shippingTemplate, paymentTemplate) {
+ 
+     window.AdminOrder = new Class.create();
+ 
+@@ -1471,6 +1472,7 @@
+                 country: $(parameters.countryElementId).value,
+                 vat: $(parameters.vatElementId).value
+             };
++            var escapedVat = _.escape(params.vat);
+ 
+             if (this.storeId !== false) {
+                 params.store_id = this.storeId;
+@@ -1491,7 +1493,7 @@
+                             if (true === response.valid) {
+                                 message = parameters.vatValidMessage;
+                             } else if (true === response.success) {
+-                                message = parameters.vatInvalidMessage.replace(/%s/, params.vat);
++                                message = parameters.vatInvalidMessage.replace(/%s/, escapedVat);
+                             } else {
+                                 message = parameters.vatValidationFailedMessage;
+                             }
+@@ -1506,7 +1508,7 @@
+                                     groupActionRequired = 'change';
+                                 }
+                             } else if (response.success) {
+-                                message = parameters.vatInvalidMessage.replace(/%s/, params.vat);
++                                message = parameters.vatInvalidMessage.replace(/%s/, escapedVat);
+                                 groupActionRequired = 'inform';
+                             } else {
+                                 message = parameters.vatValidationFailedMessage;
+diff --git a/vendor/magento/framework/Escaper.php b/vendor/magento/framework/Escaper.php
+index 9c249923197fb..e873a9a8a933d 100644
+--- a/vendor/magento/framework/Escaper.php
++++ b/vendor/magento/framework/Escaper.php
+@@ -387,7 +387,7 @@ public function escapeJsQuote($data, $quote = '\'')
+      */
+     public function escapeXssInUrl($data)
+     {
+-        $data = html_entity_decode((string)$data);
++        $data = $this->decodeHtmlEntitiesToFixedPoint((string)$data);
+         $this->getTranslateInline()->processResponseBody($data);
+ 
+         return htmlspecialchars(
+@@ -398,6 +398,26 @@ public function escapeXssInUrl($data)
+         );
+     }
+ 
++    /**
++     * Decode HTML entities repeatedly until stable, or return empty if still decoding at the cap.
++     *
++     * @param string $data
++     * @return string
++     */
++    private function decodeHtmlEntitiesToFixedPoint(string $data): string
++    {
++        $iterationCap = 10;
++        for ($iteration = 0; $iteration < $iterationCap; $iteration++) {
++            $decoded = html_entity_decode($data);
++            if ($decoded === $data) {
++                return $data;
++            }
++            $data = $decoded;
++        }
++
++        return '';
++    }
++
+     /**
+      * Remove `javascript:`, `vbscript:`, `data:` words from the string.
+      *

@@ -6,6 +6,7 @@ on:
 jobs:
   generate-matrix:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -32,6 +33,7 @@ jobs:
   test:
     needs: generate-matrix
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -58,6 +60,7 @@ jobs:
   test-summary:
     needs: test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: always()
     steps:
       - name: Check test results

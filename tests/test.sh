@@ -33,6 +33,34 @@ for arg in "$@"; do
     fi
 done
 
+# Adobe ships separate patches for Adobe Commerce. These are the Community
+# Edition ones, and on an EE store they apply to the shared packages and report
+# a fully patched install while the EE-specific code Adobe patches separately is
+# untouched — a green banner over a store that is not covered. Composer refuses
+# the install instead, and this is here so that refusal cannot be deleted by
+# accident: there is no licensed EE image to prove it against at run time.
+check_edition_scope() {
+    local missing=""
+
+    for pkg in magento/product-enterprise-edition magento/product-b2b-edition; do
+        php -r '
+            $j = json_decode(file_get_contents("composer.json"), true);
+            exit(isset($j["conflict"][$argv[1]]) ? 0 : 1);
+        ' "$pkg" || missing="$missing $pkg"
+    done
+
+    if [ -n "$missing" ]; then
+        echo -e "❌ ${CLR_RED}composer.json no longer conflicts with:$missing"
+        echo -e "   Without it these Community Edition patches install on an Adobe Commerce"
+        echo -e "   store and report it fully patched.${CLR_RESET}"
+        exit 1
+    fi
+
+    echo -e "✅ ${CLR_GREEN}Edition scope: Adobe Commerce and B2B are refused at resolution${CLR_RESET}"
+}
+
+check_edition_scope
+
 test_configuration() {
     local PACKAGE=$1
     local APP_VERSION=$2
@@ -57,7 +85,21 @@ test_configuration() {
         echo -e "${CLR_RESET}"
     fi
 
-    TEST_OUTPUT=$(docker exec "$CONTAINER_NAME" sh -c "composer require samjuk/m2-meta-security-patches:@dev --no-interaction -W -vvv && composer patch:list" 2>&1)
+    TEST_OUTPUT=$(docker exec "$CONTAINER_NAME" sh -c "
+        composer config --json extra.magento-patches.trust '[\"samjuk/*\"]' \
+        && composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true \
+        && composer require samjuk/m2-meta-security-patches:@dev --no-interaction -W -vvv \
+        && composer patches:status -v \
+        && composer patches:verify \
+        && composer patches:list --json | php -r '
+            \$j = json_decode(stream_get_contents(STDIN), true);
+            \$n = count(\$j[\"patches\"] ?? []);
+            if (\$n === 0) {
+                fwrite(STDERR, \"no patches declared — an include path is wrong, and verify exits 0 on an empty set\n\");
+                exit(1);
+            }
+            fwrite(STDERR, sprintf(\"%d patches declared\n\", \$n));
+        '" 2>&1)
     if [ "$?" -ne 0 ]; then
         echo -e "❌ ${CLR_RED}Test failed for configuration: Package=$PACKAGE, App Version=$APP_VERSION, PHP Version=$PHP_VERSION${CLR_GREY}"
         if [ "$SUMMARY" = false ]; then

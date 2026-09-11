@@ -1,0 +1,108 @@
+{
+    "lines": {
+        "2.4.6-p15": {
+            "base": {
+                "magento/magento2-base": "2.4.6-p15"
+            },
+            "cumulative": true,
+            "patches": [
+                {
+                    "id": "2026-07-001",
+                    "source": "2026-07-001/2.4.6-p15-CE.patch",
+                    "label": "July Isolated",
+                    "description": "Adobe isolated security patch for July 2026 (Community Edition)."
+                },
+                {
+                    "id": "2026-08-001",
+                    "source": "2026-08-001/2.4.6-p15-CE.patch",
+                    "label": "August Isolated",
+                    "description": "Adobe isolated security patch for August 2026 (Community Edition)."
+                },
+                {
+                    "id": "2026-09-001",
+                    "source": "2026-09-001/2.4.6-p15-CE.patch",
+                    "label": "September Isolated",
+                    "description": "Adobe isolated security patch for September 2026 (Community Edition)."
+                }
+            ]
+        },
+        "2.4.7-p10": {
+            "base": {
+                "magento/magento2-base": "2.4.7-p10"
+            },
+            "cumulative": true,
+            "patches": [
+                {
+                    "id": "2026-07-001",
+                    "source": "2026-07-001/2.4.7-p10-CE.patch",
+                    "label": "July Isolated",
+                    "description": "Adobe isolated security patch for July 2026 (Community Edition)."
+                },
+                {
+                    "id": "2026-08-001",
+                    "source": "2026-08-001/2.4.7-p10-CE.patch",
+                    "label": "August Isolated",
+                    "description": "Adobe isolated security patch for August 2026 (Community Edition)."
+                },
+                {
+                    "id": "2026-09-001",
+                    "source": "2026-09-001/2.4.7-p10-CE.patch",
+                    "label": "September Isolated",
+                    "description": "Adobe isolated security patch for September 2026 (Community Edition)."
+                }
+            ]
+        },
+        "2.4.8-p5": {
+            "base": {
+                "magento/magento2-base": "2.4.8-p5"
+            },
+            "cumulative": true,
+            "patches": [
+                {
+                    "id": "2026-07-001",
+                    "source": "2026-07-001/2.4.8-p5-CE.patch",
+                    "label": "July Isolated",
+                    "description": "Adobe isolated security patch for July 2026 (Community Edition)."
+                },
+                {
+                    "id": "2026-08-001",
+                    "source": "2026-08-001/2.4.8-p5-CE.patch",
+                    "label": "August Isolated",
+                    "description": "Adobe isolated security patch for August 2026 (Community Edition)."
+                },
+                {
+                    "id": "2026-09-001",
+                    "source": "2026-09-001/2.4.8-p5-CE.patch",
+                    "label": "September Isolated",
+                    "description": "Adobe isolated security patch for September 2026 (Community Edition)."
+                }
+            ]
+        },
+        "2.4.9": {
+            "base": {
+                "magento/magento2-base": "2.4.9"
+            },
+            "cumulative": true,
+            "patches": [
+                {
+                    "id": "2026-07-001",
+                    "source": "2026-07-001/2.4.9-CE.patch",
+                    "label": "July Isolated",
+                    "description": "Adobe isolated security patch for July 2026 (Community Edition)."
+                },
+                {
+                    "id": "2026-08-001",
+                    "source": "2026-08-001/2.4.9-CE.patch",
+                    "label": "August Isolated",
+                    "description": "Adobe isolated security patch for August 2026 (Community Edition)."
+                },
+                {
+                    "id": "2026-09-001",
+                    "source": "2026-09-001/2.4.9-CE.patch",
+                    "label": "September Isolated",
+                    "description": "Adobe isolated security patch for September 2026 (Community Edition)."
+                }
+            ]
+        }
+    }
+}

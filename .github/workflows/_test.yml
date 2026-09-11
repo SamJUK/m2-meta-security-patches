@@ -43,15 +43,42 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Retried only when the failure names a network problem. A blanket retry
+      # would run a genuinely flaky patch three times and report the run that
+      # happened to pass, which is the same blindness `patch:list || true` gave
+      # us. A patch that does not apply fails once, immediately.
       - name: Run test for ${{ matrix.magento_version }}
         run: |
           CONTAINER_IMAGE="${{ matrix.package }}:${{ matrix.magento_version }}-${{ matrix.php_version }}"
-          
-          docker run --rm \
-            --name "m2-meta-security-patches-test-${{ matrix.magento_version }}-${{ matrix.php_version }}" \
-            -v "$(pwd)/:/var/www/html/extensions/m2-meta-security-patches:ro" \
-            $CONTAINER_IMAGE \
-            sh -c "composer require samjuk/m2-meta-security-patches:@dev --no-interaction -W -vvv && composer patch:list || true"
+
+          for attempt in 1 2 3; do
+            set +e
+            OUTPUT=$(docker run --rm \
+              --name "m2-meta-security-patches-test-${{ matrix.magento_version }}-${{ matrix.php_version }}-${attempt}" \
+              -v "$(pwd)/:/var/www/html/extensions/m2-meta-security-patches:ro" \
+              $CONTAINER_IMAGE \
+              sh -c "composer config --json extra.magento-patches.trust '[\"samjuk/*\"]' \
+                && composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true \
+                && composer require samjuk/m2-meta-security-patches:@dev --no-interaction -W \
+                && composer patches:status -v \
+                && composer patches:verify" 2>&1)
+            STATUS=$?
+            set -e
+
+            echo "$OUTPUT"
+            [ $STATUS -eq 0 ] && exit 0
+
+            if ! echo "$OUTPUT" | grep -qiE 'curl error|connection timed out|could not resolve|network is unreachable|failed to (download|open stream)|50[0234] (Bad Gateway|Service Unavailable|Gateway Time)|temporary failure in name resolution'; then
+              echo "::error::Failed for a reason that is not transient — not retrying"
+              exit $STATUS
+            fi
+
+            echo "::warning::Attempt ${attempt} hit a network error, retrying"
+            sleep $((attempt * 15))
+          done
+
+          echo "::error::Still failing on a network error after 3 attempts"
+          exit 1
 
       - name: Output result
         if: success()

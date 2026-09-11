@@ -1,0 +1,85 @@
+{
+    "patches": [
+        {
+            "id": "CVE-2025-54236",
+            "label": "Session Reaper",
+            "source": "CVE-2025-54236.patch",
+            "base": {
+                "magento/framework": ">= 103.0.8 <=103.0.8-p2 || >=103.0.7 <=103.0.7-p7 || >=103.0.6 <=103.0.6-p12 || >=103.0.5 <=103.0.5-p14 || <103.0.5"
+            },
+            "description": "Adobe out-of-band fix for CVE-2025-54236, published outside the monthly cycle."
+        },
+        {
+            "id": "CVE-2024-34102",
+            "label": "Cosmicsting",
+            "source": "CVE-2024-34102.patch",
+            "base": {
+                "magento/framework": "==103.0.7 || >=103.0.6 <=103.0.6-p5 || >=103.0.5 <=103.0.5-p7 || >=103.0.4 <=103.0.4-p8 || <103.0.4"
+            },
+            "description": "Adobe out-of-band fix for CVE-2024-34102, published outside the monthly cycle."
+        },
+        {
+            "id": "APSB25-94",
+            "label": "Polyshell",
+            "source": "APSB25-94.diff",
+            "base": {
+                "magento/framework": "< 103.0.9 || 103.0.9-alpha1 || 103.0.9-alpha2"
+            },
+            "description": "Adobe out-of-band fix for APSB25-94, published outside the monthly cycle."
+        }
+    ],
+    "lines": {
+        "2.4.6-p15": {
+            "base": {
+                "magento/magento2-base": "2.4.6-p15"
+            },
+            "patches": [
+                {
+                    "id": "APSB26-146",
+                    "label": "StyleSmuggler",
+                    "source": "VULN-39341/2.4.6-p15.patch",
+                    "description": "Adobe out-of-band fix for APSB26-146, applied on top of the monthly isolated chain."
+                }
+            ]
+        },
+        "2.4.7-p10": {
+            "base": {
+                "magento/magento2-base": "2.4.7-p10"
+            },
+            "patches": [
+                {
+                    "id": "APSB26-146",
+                    "label": "StyleSmuggler",
+                    "source": "VULN-39341/2.4.7-p10.patch",
+                    "description": "Adobe out-of-band fix for APSB26-146, applied on top of the monthly isolated chain."
+                }
+            ]
+        },
+        "2.4.8-p5": {
+            "base": {
+                "magento/magento2-base": "2.4.8-p5"
+            },
+            "patches": [
+                {
+                    "id": "APSB26-146",
+                    "label": "StyleSmuggler",
+                    "source": "VULN-39341/2.4.8-p5.patch",
+                    "description": "Adobe out-of-band fix for APSB26-146, applied on top of the monthly isolated chain."
+                }
+            ]
+        },
+        "2.4.9": {
+            "base": {
+                "magento/magento2-base": "2.4.9"
+            },
+            "patches": [
+                {
+                    "id": "APSB26-146",
+                    "label": "StyleSmuggler",
+                    "source": "VULN-39341/2.4.9.patch",
+                    "description": "Adobe out-of-band fix for APSB26-146, applied on top of the monthly isolated chain."
+                }
+            ]
+        }
+    }
+}

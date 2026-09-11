@@ -4,9 +4,14 @@ on:
   pull_request:
     types: [labeled]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check-authorization:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     if: github.event.label.name == 'run-tests'
     outputs:
       authorized: ${{ steps.check-permission.outputs.authorized }}
@@ -39,6 +44,7 @@ jobs:
   check-label:
     needs: check-authorization
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     if: needs.check-authorization.outputs.authorized == 'true'
     outputs:
       should-run: ${{ steps.check.outputs.result }}
@@ -55,6 +61,7 @@ jobs:
   remove-label:
     needs: [check-authorization, check-label, run-tests]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     if: always() && needs.check-authorization.outputs.authorized == 'true'
     steps:
       - name: Remove run-tests label

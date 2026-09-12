@@ -6,6 +6,21 @@ Notable changes, newest first.
 
 Nothing yet.
 
+## 2026.09.11-beta2 — 2026-09-12
+
+Second beta. Same patches as `beta1`; the installer underneath moved to
+`0.2.0`.
+
+### Changed
+
+- **Breaking for scripts.** The commands are now `magento-patches:*`, not
+  `patches:*`. Composer treats `patch` as an abbreviation of `patches`, so on
+  a store also running vaimo you could not tell which tool a command would
+  reach.
+
+  Update any pipeline that calls `patches:verify`. It fails loudly, not
+  silently. Patching on install and update is unaffected.
+
 ## 2026.09.11-beta1 — 2026-09-11
 
 **Pre-release.** Tagged beta on purpose: stores on a stable constraint such as

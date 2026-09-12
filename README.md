@@ -67,7 +67,7 @@ Leaving the existing files as they are is deliberate: they work, and rewriting t
 
 Reinstalling or updating `magento/magento2-base` re-extracts the package and reverts the patched files, including the ~120 it deploys to the project root. Under `vaimo/composer-patches` nothing noticed: `composer patch:list` still reported `[APPLIED]` and `composer install` still said `Nothing to patch` ([vaimo/composer-patches#162](https://github.com/vaimo/composer-patches/issues/162)).
 
-`samjuk/magento-patch-installer` re-checks every target against the working tree on every run, so this heals itself — the next `composer install` re-applies whatever the reinstall reverted, and `composer patches:verify` exits non-zero in the window before it does. No manual `patch:redo` step, and nothing to wire into a script.
+`samjuk/magento-patch-installer` re-checks every target against the working tree on every run, so this heals itself — the next `composer install` re-applies whatever the reinstall reverted, and `composer magento-patches:verify` exits non-zero in the window before it does. No manual re-apply step, and nothing to wire into a script.
 
 ## Installation
 
@@ -112,18 +112,18 @@ Which writes:
 ### Checking a store
 
 ```bash
-composer patches:list      # every patch this package ships, and which are for you
-composer patches:status    # this store: version, support, and every patch's state
-composer patches:status -v # per-target detail, including anything not covered
-composer patches:verify    # exit 0 all applied, 1 missing, 2 conflict, 3 misconfigured
-composer patches:apply     # apply whatever is missing
+composer magento-patches:list      # every patch this package ships, and which are for you
+composer magento-patches:status    # this store: version, support, and every patch's state
+composer magento-patches:status -v # per-target detail, including anything not covered
+composer magento-patches:verify    # exit 0 all applied, 1 missing, 2 conflict, 3 misconfigured
+composer magento-patches:apply     # apply whatever is missing
 ```
 
-`patches:list` reads nothing from the working tree, so it answers before
+`magento-patches:list` reads nothing from the working tree, so it answers before
 `composer install` has ever run — useful for deciding whether this package
 covers your release line at all.
 
-`composer patches:verify` is the one to put in a deploy pipeline, as its own step rather than relying on the install: `composer install --no-plugins`, and a missing `allow-plugins` entry, each run a whole install and exit `0` having applied nothing, and neither can be reported from inside a plugin that never ran.
+`composer magento-patches:verify` is the one to put in a deploy pipeline, as its own step rather than relying on the install: `composer install --no-plugins`, and a missing `allow-plugins` entry, each run a whole install and exit `0` having applied nothing, and neither can be reported from inside a plugin that never ran.
 
 A patch that cannot apply fails the Composer run by default; `extra.magento-patches.allow-unpatched` overrides that if you need it.
 

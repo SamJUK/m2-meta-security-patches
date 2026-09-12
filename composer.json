@@ -4,7 +4,7 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "samjuk/magento-patch-installer": "^0.1"
+        "samjuk/magento-patch-installer": "^0.2"
     },
     "conflict": {
         "magento/product-enterprise-edition": "*",

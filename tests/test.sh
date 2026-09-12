@@ -89,9 +89,9 @@ test_configuration() {
         composer config --json extra.magento-patches.trust '[\"samjuk/*\"]' \
         && composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true \
         && composer require samjuk/m2-meta-security-patches:@dev --no-interaction -W -vvv \
-        && composer patches:status -v \
-        && composer patches:verify \
-        && composer patches:list --json | php -r '
+        && composer magento-patches:status -v \
+        && composer magento-patches:verify \
+        && composer magento-patches:list --json | php -r '
             \$j = json_decode(stream_get_contents(STDIN), true);
             \$n = count(\$j[\"patches\"] ?? []);
             if (\$n === 0) {

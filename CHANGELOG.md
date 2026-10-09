@@ -4,6 +4,10 @@ Notable changes, newest first.
 
 ## Unreleased
 
+Nothing yet.
+
+## 2026.10.09 — 2026-10-09
+
 First stable release on
 [`samjuk/magento-patch-installer`](https://github.com/SamJUK/magento-patch-installer),
 replacing `vaimo/composer-patches`. Same isolated and emergency patches as

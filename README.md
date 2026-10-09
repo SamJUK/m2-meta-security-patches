@@ -54,14 +54,14 @@ For detailed information on each patch, see the patches in [patches/emergency/](
 
 ## Changes we make to Adobe's patches
 
-**New monthly drops go in unmodified.** Adobe's patch file is added as-is; nothing is rewritten on the way in.
+None. Every file in `patches/isolated/`, and every `VULN-*` file in `patches/emergency/`, is Adobe's own byte for byte. Its sha256 is the one Adobe publishes in its patch registry, so you can check it yourself:
 
-Two historical edits remain in the patch files added before `samjuk/magento-patch-installer` existed, both of which were workarounds for `vaimo/composer-patches` and neither of which is needed any more:
+```sh
+curl -s https://repo.magento.com/patch/patch-registry.json | jq -r '.patches["249-2026-08-001-CE"].sha256'
+shasum -a 256 vendor/samjuk/m2-meta-security-patches/patches/isolated/2026-08-001/2.4.9-CE.patch
+```
 
-- **Hunks against project root files were repointed at `vendor/magento/magento2-base/`.** vaimo patched before Magento deployed those files to the root, so a clean install had nothing to patch yet. The installer now resolves the two copies of a root-mapped file from the package's own `extra.map` and keeps both patched, whichever path the hunk names — so the repointed files and Adobe's originals both work.
-- **`vendor/bin/patch-status` hunks were stripped.** Adobe regenerates this reporting CLI every month, so re-applying used to abort the whole run with `already exists in working directory`. The installer now recognises a file it wrote for an earlier patch in the same chain and replaces it, so the hunk can stay.
-
-Leaving the existing files as they are is deliberate: they work, and rewriting them would churn the patches that protect the stores already running them.
+Releases up to `2026.09.11-beta2` carried two workarounds for `vaimo/composer-patches`: hunks against project root files were repointed at `vendor/magento/magento2-base/`, and the `vendor/bin/patch-status` hunks were stripped. `samjuk/magento-patch-installer` 0.2.1 needs neither. It patches both copies of a root file whichever one a hunk names, and it checks each month beneath the later months that edit the same file, which Adobe's July and August both do to `vendor/bin/patch-status`. Updating from an earlier release leaves everything already patched alone and adds `vendor/bin/patch-status`, Adobe's reporting tool.
 
 ## Patches that revert themselves
 

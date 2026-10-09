@@ -61,7 +61,7 @@ curl -s https://repo.magento.com/patch/patch-registry.json | jq -r '.patches["24
 shasum -a 256 vendor/samjuk/m2-meta-security-patches/patches/isolated/2026-08-001/2.4.9-CE.patch
 ```
 
-Releases up to `2026.09.11-beta2` carried two workarounds for `vaimo/composer-patches`: hunks against project root files were repointed at `vendor/magento/magento2-base/`, and the `vendor/bin/patch-status` hunks were stripped. `samjuk/magento-patch-installer` 0.3 needs neither. It patches both copies of a root file whichever one a hunk names, and it checks each month beneath the later months that edit the same file, which Adobe's July and August both do to `vendor/bin/patch-status`. Updating from an earlier release leaves everything already patched alone and adds `vendor/bin/patch-status`, Adobe's reporting tool.
+Releases up to `2026.09.11-beta2` carried two workarounds for `vaimo/composer-patches`: hunks against project root files were repointed at `vendor/magento/magento2-base/`, and the `vendor/bin/patch-status` hunks were stripped. `samjuk/magento-patch-installer` 0.2.1 needs neither. It patches both copies of a root file whichever one a hunk names, and it checks each month beneath the later months that edit the same file, which Adobe's July and August both do to `vendor/bin/patch-status`. Updating from an earlier release leaves everything already patched alone and adds `vendor/bin/patch-status`, Adobe's reporting tool.
 
 ## Patches that revert themselves
 

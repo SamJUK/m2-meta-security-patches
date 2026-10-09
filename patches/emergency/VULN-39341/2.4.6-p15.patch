@@ -224,10 +224,10 @@ index 3737d86d2b1f6..d96ba1384f2d8 100644
          return $reportId;
      }
  }
-diff --git a/vendor/magento/magento2-base/pub/errors/processor.php b/vendor/magento/magento2-base/pub/errors/processor.php
+diff --git a/pub/errors/processor.php b/pub/errors/processor.php
 index 0cb182700856c..14432fa9dfab7 100644
---- a/vendor/magento/magento2-base/pub/errors/processor.php
-+++ b/vendor/magento/magento2-base/pub/errors/processor.php
+--- a/pub/errors/processor.php
++++ b/pub/errors/processor.php
 @@ -29,6 +29,11 @@ class Processor
      const ERROR_DIR = 'pub/errors';
      const NUMBER_SYMBOLS_IN_SUBDIR_NAME = 2;

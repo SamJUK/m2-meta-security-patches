@@ -4,7 +4,18 @@ Notable changes, newest first.
 
 ## Unreleased
 
-Nothing yet.
+### Changed
+
+- Requires `samjuk/magento-patch-installer` `^0.3`. 0.2 reports a month whose
+  file a later month edits as not applied, and Adobe's July and August both edit
+  `vendor/bin/patch-status`.
+- The July and August isolated patches and the StyleSmuggler (VULN-39341)
+  patches are now Adobe's files byte for byte, sha256-matched against Adobe's
+  patch registry. That drops the two `vaimo/composer-patches` workarounds and
+  brings back `vendor/bin/patch-status`. A store that is already patched only
+  gains that file.
+- July's 2.4.8-p5 patch is Adobe's current build of it. Adobe re-issued the file
+  after release day with different context lines and the same changes.
 
 ## 2026.09.11-beta2 — 2026-09-12
 

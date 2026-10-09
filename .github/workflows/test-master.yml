@@ -5,6 +5,13 @@ on:
     branches:
       - master
       - main
+    # A changelog bump or README edit changes nothing that installs. A push that
+    # also touches anything else still runs.
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.claude/**'
 
 jobs:
   run-tests:

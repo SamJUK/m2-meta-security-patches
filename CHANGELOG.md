@@ -4,8 +4,8 @@ Notable changes, newest first.
 
 ## Unreleased
 
-🎉 Adds Adobe's October 2026 isolated security patches for 2.4.9, 2.4.8-p5
-and 2.4.7-p10. 9 CVEs.
+🎉 Adds Adobe's October 2026 isolated security patches (APSB26-153) for
+2.4.9, 2.4.8-p5 and 2.4.7-p10. 9 CVEs.
 
 **These patches only apply to the latest patch release of each line. If you
 are behind, they will skip.**
@@ -42,6 +42,8 @@ Already on `2026.10.09`? Nothing to add.
 
 - `2026-10-001` (CE) on 2.4.9, 2.4.8-p5 and 2.4.7-p10, applied on top of
   September. ([#15](https://github.com/SamJUK/m2-meta-security-patches/pull/15))
+- StyleSmuggler (APSB26-146) is still applied alongside October, as Adobe's
+  bulletin asks.
 
 ### Not included
 
@@ -55,10 +57,12 @@ Already on `2026.10.09`? Nothing to add.
   on 2.4.9, 2.4.8-p5 and 2.4.7-p10: every target applied, a second install
   writes nothing, a `magento2-base` reinstall heals, and a fresh `vendor/`
   comes back patched.
+- All 82 Magento and Mage-OS images in the CI matrix.
 
 ### References
 
-- {Adobe bulletin, not published at the time of writing}
+- https://www.adobe.com/trust/security/products/commerce/apsb26-153.html
+- https://experienceleague.adobe.com/en/docs/experience-cloud-kcs/kbarticles/ka-49323
 
 ## 2026.10.09 — 2026-10-09
 

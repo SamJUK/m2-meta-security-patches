@@ -4,6 +4,10 @@ Notable changes, newest first.
 
 ## Unreleased
 
+Nothing yet.
+
+## 2026.10.13 — 2026-10-13
+
 🎉 Adds Adobe's October 2026 isolated security patches (APSB26-153) for
 2.4.9, 2.4.8-p5 and 2.4.7-p10. 9 CVEs.
 

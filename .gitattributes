@@ -2,3 +2,5 @@
 /.github export-ignore
 /.gitignore export-ignore
 /.gitattributes export-ignore
+/.claude export-ignore
+/bin export-ignore

@@ -136,6 +136,8 @@ The versioning of this meta package follows date based versioning to indicate th
 
 To contribute to the development of this meta package:
 
+Monthly isolated patches can be pulled from Adobe's registry with `python3 -I bin/ingest-adobe-patches.py`, which does steps 2 and 3 for every base line and reports anything that needs a decision. The [patch-day procedure](.claude/skills/ingest-adobe-patches/SKILL.md) is written for a coding agent but readable by anyone.
+
 1. Clone the repository
 2. Drop Adobe's patch file into `patches/isolated/` or `patches/emergency/` **unmodified**
 3. Declare it in `patches/isolated/patches.json` or `patches/emergency/patches.json` — `composer.json` only lists those files. A new monthly patch is one entry appended to the end of that base line's `patches` list. The isolated lines are marked `"cumulative": true`, which means the order they are listed in *is* the order they apply in, so nothing declares `depends` and no link can be left out

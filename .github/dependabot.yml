@@ -1,0 +1,12 @@
+version: 2
+updates:
+  # One pull request a month, every action bumped together.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      github-actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: ci

@@ -12,6 +12,7 @@ on:
       - 'docs/**'
       - 'LICENSE'
       - '.claude/**'
+      - '.github/dependabot.yml'
 
 jobs:
   run-tests:

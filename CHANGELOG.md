@@ -4,7 +4,61 @@ Notable changes, newest first.
 
 ## Unreleased
 
-Nothing yet.
+🎉 Adds Adobe's October 2026 isolated security patches for 2.4.9, 2.4.8-p5
+and 2.4.7-p10. 9 CVEs.
+
+**These patches only apply to the latest patch release of each line. If you
+are behind, they will skip.**
+
+### ⚠️ Updating from `2026.09.08` or earlier?
+
+`2026.10.09` replaced `vaimo/composer-patches` with
+[`samjuk/magento-patch-installer`](https://github.com/SamJUK/magento-patch-installer).
+If this is your first update since then, **add these two lines before you
+update, or `composer update` will fail:**
+
+```sh
+composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true
+composer config --json extra.magento-patches.trust '["samjuk/*"]'
+```
+
+Composer refuses to run a plugin it has not been told to trust, and refuses to
+read patches from a package you have not named. Without both lines the update
+stops partway, leaving no patcher installed until they are added. Adding them
+and running `composer install` recovers fully.
+
+You do not need to remove `vaimo/composer-patches` by hand. The update removes
+it, and it reverts its own patches on the way out before the new installer
+re-applies them.
+
+Then add `composer magento-patches:verify` to your deploy pipeline as its own
+step. `composer install --no-plugins`, or a missing `allow-plugins` entry,
+installs everything, applies nothing and exits `0`. Only a separate step can
+catch that.
+
+Already on `2026.10.09`? Nothing to add.
+
+### Added
+
+- `2026-10-001` (CE) on 2.4.9, 2.4.8-p5 and 2.4.7-p10, applied on top of
+  September. ([#15](https://github.com/SamJUK/m2-meta-security-patches/pull/15))
+
+### Not included
+
+- 2.4.6-p15 stays on September. 2.4.6 reached end of life on 11th August 2026,
+  and Adobe restricts its October patch to Adobe Commerce licence holders, so
+  this package cannot ship it.
+
+### Testing
+
+- Fresh install, and upgrade from both `2026.10.09` and `2026.09.08` (vaimo),
+  on 2.4.9, 2.4.8-p5 and 2.4.7-p10: every target applied, a second install
+  writes nothing, a `magento2-base` reinstall heals, and a fresh `vendor/`
+  comes back patched.
+
+### References
+
+- {Adobe bulletin, not published at the time of writing}
 
 ## 2026.10.09 — 2026-10-09
 

@@ -38,6 +38,7 @@ Each monthly patch is also built against, and will only apply to, the **latest p
 - **2026-07-001 (CE)** - Adobe Commerce monthly isolated security release, July 2026. CE-only; EE/B2B variants not currently included in this package.
 - **2026-08-001 (CE)** - Adobe Commerce monthly isolated security release, August 2026. CE-only; EE/B2B variants not currently included in this package.
 - **2026-09-001 (CE)** - Adobe Commerce monthly isolated security release, September 2026. CE-only; EE/B2B variants not currently included in this package.
+- **2026-10-001 (CE)** - Adobe Commerce monthly isolated security release, October 2026. CE-only; EE/B2B variants not currently included in this package. Not for 2.4.6-p15: Adobe restricts that file to Adobe Commerce licence holders.
 
 For detailed information on each patch, see the patches in [patches/isolated/](patches/isolated/).
 

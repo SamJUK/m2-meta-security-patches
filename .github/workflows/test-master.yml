@@ -9,6 +9,7 @@ on:
     # also touches anything else still runs.
     paths-ignore:
       - '**.md'
+      - '.github/workflows/post-release.yml'
       - 'docs/**'
       - 'LICENSE'
       - '.claude/**'

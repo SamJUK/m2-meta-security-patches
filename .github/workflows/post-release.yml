@@ -1,0 +1,70 @@
+name: Post-release check
+
+# A published release, installed from Packagist the way a store gets it: fresh,
+# and as an update from the release before it. Proves the tag reached Packagist
+# and the dist works.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release to check, e.g. 2026.10.13
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  wait-for-packagist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      version: ${{ steps.wait.outputs.version }}
+      lines: ${{ steps.lines.outputs.lines }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: List the isolated lines
+        id: lines
+        run: echo "lines=$(jq -c '.lines | keys' patches/isolated/patches.json)" >> "$GITHUB_OUTPUT"
+
+      # A tag that never reaches Packagist looks exactly like a release that did,
+      # until a store tries to update.
+      - name: Wait for Packagist
+        id: wait
+        env:
+          VERSION: ${{ inputs.version || github.event.release.tag_name }}
+        run: |
+          for _ in $(seq 1 30); do
+            if curl -sf "https://repo.packagist.org/p2/samjuk/m2-meta-security-patches.json?$(date +%s)" \
+                | jq -e --arg v "$VERSION" '[.packages[][] | .version] | index($v)' >/dev/null; then
+              echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "::error::$VERSION is not on Packagist after 15 minutes. Its GitHub grant may have lapsed: reconnect GitHub on the Packagist profile."
+          exit 1
+
+  check:
+    needs: wait-for-packagist
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        magento_version: ${{ fromJson(needs.wait-for-packagist.outputs.lines) }}
+        from: ['none', 'latest']
+    name: ${{ matrix.magento_version }} from ${{ matrix.from }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install ${{ needs.wait-for-packagist.outputs.version }} from ${{ matrix.from }}
+        env:
+          FROM: ${{ matrix.from }}
+          TO: ${{ needs.wait-for-packagist.outputs.version }}
+        run: bash tests/upgrade.sh "${{ matrix.magento_version }}"

@@ -9,6 +9,7 @@ jobs:
     timeout-minutes: 15
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      lines: ${{ steps.set-lines.outputs.lines }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,6 +30,11 @@ jobs:
             }
           ]')
           echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+
+      # One per isolated base line: the versions a monthly patch lands on.
+      - name: List the isolated lines
+        id: set-lines
+        run: echo "lines=$(jq -c '.lines | keys' patches/isolated/patches.json)" >> "$GITHUB_OUTPUT"
 
   test:
     needs: generate-matrix
@@ -84,15 +90,33 @@ jobs:
         if: success()
         run: echo "✅ Test succeeded for ${{ matrix.magento_version }} (${{ matrix.php_version }})"
 
+  # A store on the newest release updating to this tree, then running Composer
+  # again: where a month that rewrites an earlier month's lines fails.
+  upgrade:
+    needs: generate-matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        magento_version: ${{ fromJson(needs.generate-matrix.outputs.lines) }}
+    name: Upgrade ${{ matrix.magento_version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Upgrade from the newest release
+        run: bash tests/upgrade.sh "${{ matrix.magento_version }}"
+
   test-summary:
-    needs: test
+    needs: [test, upgrade]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     if: always()
     steps:
       - name: Check test results
         run: |
-          if [ "${{ needs.test.result }}" == "failure" ]; then
+          if [ "${{ needs.test.result }}" == "failure" ] || [ "${{ needs.upgrade.result }}" == "failure" ]; then
             echo "❌ Some tests failed"
             exit 1
           else

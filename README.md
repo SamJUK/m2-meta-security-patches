@@ -152,8 +152,9 @@ Full E2E tests are run via GitHub Actions:
 
 - **On master/main commits**: Tests run automatically on every push
 - **On pull requests**: Add the `run-tests` label to trigger the test suite
+- **On publishing a release**: the release is installed from Packagist, fresh and as an update, on every isolated line. Run it again with `gh workflow run post-release.yml -f version=<version>`
 
-The test suite validates the package installation across multiple Magento versions and PHP versions (see [matrix.json](tests/matrix.json) for the complete matrix).
+The test suite validates the package installation across multiple Magento versions and PHP versions (see [matrix.json](tests/matrix.json) for the complete matrix). It also updates a store on every isolated line from the newest release.
 
 ### Local Testing
 
@@ -164,6 +165,14 @@ sh tests/test.sh
 ```
 
 This will test the package installation across all supported Magento/PHP version combinations. Be aware, this can take a significant amount of disk space and time.
+
+`tests/upgrade.sh` tests the other path: a store on a release from Packagist updating the way this README says, then running Composer again. That is where a month that rewrites an earlier month's lines would fail.
+
+```sh
+bash tests/upgrade.sh 2.4.9                           # newest release -> this working tree
+FROM=2026.10.09 bash tests/upgrade.sh 2.4.9           # from a given release
+FROM=none TO=2026.10.13 bash tests/upgrade.sh 2.4.9   # fresh install of a published release
+```
 
 ## Contributing
 

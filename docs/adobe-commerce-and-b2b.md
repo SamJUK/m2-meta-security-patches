@@ -98,31 +98,3 @@ composer config --json extra.magento-patches.trust '["your-vendor/*"]'
 A private Git repository used as a Composer `vcs` repository is enough. Private Packagist, Satis and GitLab's package registry work too; GitHub Packages does not support Composer.
 
 Each store still needs its own Adobe Commerce licence. A private package is a way to share the work of keeping the files current, not a licence. We are not lawyers, so check your agreement with Adobe.
-
-## Patches this package cannot ship
-
-Sometimes Adobe restricts a Community Edition file to licence holders. 2.4.6-p15's October 2026 patch is one: this package stops at September for that line. If you hold a licence, you can add the month yourself, in your own `composer.json`, on top of this package's chain:
-
-```json
-"extra": {
-    "magento-patches": {
-        "trust": ["samjuk/*"],
-        "lines": {
-            "2.4.6-p15": {
-                "base": { "magento/magento2-base": "2.4.6-p15" },
-                "patches": [
-                    {
-                        "id": "2026-10-001",
-                        "source": "adobe-patches/246p15-2026-10-001-CE.patch",
-                        "depends": ["2026-09-001", "APSB26-146"]
-                    }
-                ]
-            }
-        }
-    }
-}
-```
-
-`depends` names what your patch is built on in this package. Name every one it overlaps: here that is September, and the StyleSmuggler hotfix, which changes two of the same files and is not part of the monthly chain. Without them the installer refuses your patch, with an error naming the patch to add. That needs samjuk/magento-patch-installer 0.3 or later; earlier versions cannot see a patch in another package.
-
-We tested this on a 2.4.6-p15 store with Adobe's real October file: all 22 files applied on top of September, and the store stayed clean through a further install, a package reinstall and a fresh `vendor/`.

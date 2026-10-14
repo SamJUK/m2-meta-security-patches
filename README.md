@@ -39,7 +39,7 @@ Updating from a release before `2026.10.09`? Those two lines are also what that 
 
 Monthly patches only apply to the newest patch release of each line. If you are behind, upgrade first: an older patch level still gets the hotfixes that cover it (Session Reaper and CosmicSting go further back), but not the monthly patches.
 
-2.4.6-p15 stops at September because Adobe keeps its October file for Adobe Commerce licence holders. [Every patch, line by line](docs/patches.md).
+2.4.6-p15 stops at September because Adobe keeps its October file for Adobe Commerce licence holders. If you hold one, [add it yourself](docs/extended-support.md). [Every patch, line by line](docs/patches.md).
 
 Requires Magento Open Source 2.4.2 or later, or Mage-OS, with PHP 7.4+ and Composer 2.2+.
 
@@ -54,6 +54,7 @@ What we recommend instead: use [samjuk/magento-patch-installer](https://github.c
 - [Usage](docs/usage.md): installing, checking a store, deploy pipelines, patches that revert themselves, upgrading from vaimo/composer-patches
 - [Included patches](docs/patches.md): every patch, how the monthly chain works, checking the files against Adobe's registry
 - [Adobe Commerce and B2B](docs/adobe-commerce-and-b2b.md): bringing your own licensed patches
+- [Extended support](docs/extended-support.md): adding the months Adobe restricts to licence holders, on top of this package
 - [Contributing](CONTRIBUTING.md): adding patches, running the tests
 - [Changelog](CHANGELOG.md)
 

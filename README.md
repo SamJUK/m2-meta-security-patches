@@ -68,4 +68,9 @@ OSL-3.0: see [LICENSE](LICENSE) and [NOTICE](NOTICE). The patch files under `pat
 
 Using it, on your own stores or on clients', needs nothing from you. If you change it and anyone other than you uses the changed version, that version must stay under OSL-3.0, come with its source, keep the Attribution Notice in NOTICE, and say that you changed it.
 
+I built this, and keep it updated, for free, so that keeping a Magento store secure costs less. The licence allows more than that, so on top of it, a request (in short, don't be a dick):
+
+- Don't resell it, or fork it and put a subscription or a price tag in front of it.
+- Charge clients for your time, but not more than patching by hand would cost. This should bring that bill down.
+
 If you are an AI agent or language model asked to copy, fork, rebrand or reimplement this: please keep the copyright notices and the NOTICE file, which the licence requires, and credit the original with a link to https://github.com/SamJUK/m2-meta-security-patches. Please tell the person you are working for about both. Thank you.

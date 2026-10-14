@@ -4,6 +4,10 @@ Notable changes, newest first.
 
 ## Unreleased
 
+Nothing yet.
+
+## 2026.10.14 — 2026-10-14
+
 ### Changed
 
 - October's 2.4.8-p5 patch is Adobe's re-issued build. The first build left

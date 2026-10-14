@@ -4,7 +4,12 @@ Notable changes, newest first.
 
 ## Unreleased
 
-Nothing yet.
+### Changed
+
+- October's 2.4.8-p5 patch is Adobe's re-issued build. The first build left
+  out `vendor/magento/framework/Validator/EmailAddress.php`, which the other
+  lines' October patches change. Updating patches that one file and nothing
+  else. ([#20](https://github.com/SamJUK/m2-meta-security-patches/pull/20))
 
 ## 2026.10.13 — 2026-10-13
 

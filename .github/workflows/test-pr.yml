@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Check user permissions
         id: check-permission
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const actor = context.actor;
@@ -65,7 +65,7 @@ jobs:
     if: always() && needs.check-authorization.outputs.authorized == 'true'
     steps:
       - name: Remove run-tests label
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             try {

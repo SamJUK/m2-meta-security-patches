@@ -20,7 +20,7 @@ usage() {
     echo "Options:"
     echo "  --summary            Show summary of test results"
     echo "  package              The composer package to test"
-    echo "  app-version          The Magento/MageOS version to test against"
+    echo "  app-version          The Magento version to test against"
     echo "  php-version          The PHP version to test against"
     exit 1
 }

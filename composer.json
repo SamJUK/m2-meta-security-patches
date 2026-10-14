@@ -8,7 +8,8 @@
     },
     "conflict": {
         "magento/product-enterprise-edition": "*",
-        "magento/product-b2b-edition": "*"
+        "magento/product-b2b-edition": "*",
+        "mage-os/framework": "*"
     },
     "keywords": [
         "security",

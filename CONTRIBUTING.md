@@ -14,7 +14,7 @@ Issues and pull requests are welcome: a patch that will not apply, a store it mi
 
 ## Testing
 
-Tests run real Magento and Mage-OS installs in Docker, from the [samjuk/magento-ci-testing-env](https://github.com/SamJUK/magento-ci-testing-env) images.
+Tests run real Magento installs in Docker, from the [samjuk/magento-ci-testing-env](https://github.com/SamJUK/magento-ci-testing-env) images.
 
 ```sh
 sh tests/test.sh                                                  # fresh install on every version in tests/matrix.json

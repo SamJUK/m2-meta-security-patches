@@ -4,6 +4,13 @@ Notable changes, newest first.
 
 ## Unreleased
 
+### Removed
+
+- **Security.** Mage-OS is no longer supported, and Composer refuses to install
+  this on it. Its packages live under `vendor/mage-os/`, where Adobe's patches
+  find nothing, yet `verify` passed. Remove this with `composer remove
+  samjuk/m2-meta-security-patches` and take Mage-OS's own releases.
+
 ### Changed
 
 - Licensed under OSL-3.0. Earlier releases stay under MIT; Adobe's patch files

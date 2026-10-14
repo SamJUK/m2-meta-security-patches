@@ -5,12 +5,12 @@
 [![Downloads](https://img.shields.io/packagist/dt/samjuk/m2-meta-security-patches)](https://packagist.org/packages/samjuk/m2-meta-security-patches)
 [![Licence](https://img.shields.io/packagist/l/samjuk/m2-meta-security-patches)](LICENSE)
 
-Adobe's security patches for Magento Open Source and Mage-OS, as one Composer package. Every monthly isolated patch and every out-of-band hotfix for your release, applied on `composer install` and checked on every run after.
+Adobe's security patches for Magento Open Source, as one Composer package. Every monthly isolated patch and every out-of-band hotfix for your release, applied on `composer install` and checked on every run after.
 
 - **Adobe's files, unmodified.** Each one matches the sha256 in Adobe's patch registry. [Check them yourself](docs/patches.md#check-the-files-yourself).
 - **Applied in Adobe's order.** Each month builds on the one before, and a missing link is refused, not skipped.
 - **Checked on every Composer run.** A package reinstall that quietly reverts a patch is found and put back.
-- **Tested on [82 Magento and Mage-OS versions](tests/matrix.json)** before each release, then installed again from Packagist once it ships.
+- **Tested on [70 Magento versions](tests/matrix.json)** before each release, then installed again from Packagist once it ships.
 - **Updated like any other dependency.** Dependabot or Renovate opens the pull request when a new month lands.
 
 ## Quick start
@@ -41,7 +41,7 @@ Monthly patches only apply to the newest patch release of each line. If you are 
 
 2.4.6-p15 stops at September because Adobe keeps its October file for Adobe Commerce licence holders. If you hold one, [add it yourself](docs/extended-support.md). [Every patch, line by line](docs/patches.md).
 
-Requires Magento Open Source 2.4.2 or later, or Mage-OS, with PHP 7.4+ and Composer 2.2+.
+Requires Magento Open Source 2.4.2 or later, with PHP 7.4+ and Composer 2.2+. Mage-OS is not supported, and Composer refuses to install this on it. Mage-OS installs its own `mage-os/*` packages under `vendor/mage-os/`, so Adobe's patches, written for `vendor/magento/`, have nothing to apply to. Mage-OS releases often, with semantic versioning, so take its releases instead.
 
 ## What about Adobe Commerce and B2B?
 

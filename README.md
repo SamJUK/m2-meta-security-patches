@@ -43,14 +43,17 @@ Monthly patches only apply to the newest patch release of each line. If you are 
 
 Requires Magento Open Source 2.4.2 or later, or Mage-OS, with PHP 7.4+ and Composer 2.2+.
 
-## Adobe Commerce and B2B
+## What about Adobe Commerce and B2B?
 
-Community Edition only: Composer refuses to install this package on an Adobe Commerce or B2B store, because Adobe patches those editions with extra files this package does not ship.
+This package is Community Edition only, and refuses to install on an Adobe Commerce or B2B store. Adobe patches those editions with extra files containing Adobe Commerce code, which a public package should not redistribute. Installed without them, the Community Edition patches here would report a store as fully patched while its Commerce code went untouched.
+
+What we recommend instead: use [samjuk/magento-patch-installer](https://github.com/SamJUK/magento-patch-installer), the patcher this package runs on, directly. Download Adobe's files under your own licence, keep them in your project or a private package, and get the same ordering, checks and self-healing. [How to set it up](docs/adobe-commerce-and-b2b.md).
 
 ## Documentation
 
 - [Usage](docs/usage.md): installing, checking a store, deploy pipelines, patches that revert themselves, upgrading from vaimo/composer-patches
 - [Included patches](docs/patches.md): every patch, how the monthly chain works, checking the files against Adobe's registry
+- [Adobe Commerce and B2B](docs/adobe-commerce-and-b2b.md): bringing your own licensed patches
 - [Contributing](CONTRIBUTING.md): adding patches, running the tests
 - [Changelog](CHANGELOG.md)
 

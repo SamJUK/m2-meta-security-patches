@@ -1,6 +1,6 @@
 # Included patches
 
-Two kinds: Adobe's monthly isolated patches, and out-of-band hotfixes for vulnerabilities that could not wait. All of them are Community Edition patches.
+Two kinds: Adobe's monthly isolated patches, and out-of-band hotfixes for vulnerabilities that could not wait. All of them are Community Edition patches. For Adobe Commerce and B2B, see [Adobe Commerce and B2B](adobe-commerce-and-b2b.md).
 
 ## Monthly isolated patches
 
@@ -18,7 +18,7 @@ Each month is built against the newest patch release of its line when it came ou
 
 `2026-10-002` exists for 2.4.8-p5 only. Adobe split the `EmailAddress.php` fix (CVE-2026-91013) out of its October patch for that line; the 2.4.7-p10 and 2.4.9 October patches already contain it.
 
-**Why does 2.4.6-p15 stop at September?** Adobe restricts its October file for 2.4.6-p15 to Adobe Commerce licence holders, so a public package cannot ship it. Files that were public when released stay here even if Adobe restricts them later.
+**Why does 2.4.6-p15 stop at September?** Adobe restricts its October file for 2.4.6-p15 to Adobe Commerce licence holders, so a public package cannot ship it. Files that were public when released stay here even if Adobe restricts them later. If you hold a licence, you can add October yourself on top of this package's chain: see [patches this package cannot ship](adobe-commerce-and-b2b.md#patches-this-package-cannot-ship).
 
 ## Out-of-band hotfixes
 

@@ -1,0 +1,37 @@
+diff --git a/vendor/magento/framework/Validator/EmailAddress.php b/vendor/magento/framework/Validator/EmailAddress.php
+index dd402cba79155..6b77f0d37cc04 100644
+--- a/vendor/magento/framework/Validator/EmailAddress.php
++++ b/vendor/magento/framework/Validator/EmailAddress.php
+@@ -9,6 +9,13 @@
+ 
+ class EmailAddress extends LaminasEmailAddress implements ValidatorInterface
+ {
++    /**
++     * Quoted Pattern
++     *
++     * @var string
++     */
++    private const QUOTED_LOCAL_PART_PATTERN = '/^"/';
++
+     /**
+      * @var string[]
+      */
+@@ -55,4 +62,18 @@ public function setValidateTld(bool $shouldValidate)
+     {
+         $this->getHostnameValidator()->setOptions(['useTldCheck' => $shouldValidate]);
+     }
++
++    /**
++     * @inheritdoc
++     */
++    public function isValid($value)
++    {
++        if (is_string($value) && preg_match(self::QUOTED_LOCAL_PART_PATTERN, $value)) {
++            $this->setValue($value);
++            $this->error(self::INVALID_FORMAT);
++            return false;
++        }
++
++        return parent::isValid($value);
++    }
+ }

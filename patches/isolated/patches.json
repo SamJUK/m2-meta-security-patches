@@ -87,6 +87,12 @@
                     "source": "2026-10-001/2.4.8-p5-CE.patch",
                     "label": "October Isolated",
                     "description": "Adobe isolated security patch for October 2026 (Community Edition)."
+                },
+                {
+                    "id": "2026-10-002",
+                    "source": "2026-10-002/2.4.8-p5-CE.patch",
+                    "label": "October Isolated 2",
+                    "description": "Adobe's second isolated security patch for October 2026, 2.4.8-p5 only (Community Edition)."
                 }
             ]
         },

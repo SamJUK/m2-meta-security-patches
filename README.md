@@ -39,6 +39,7 @@ Each monthly patch is also built against, and will only apply to, the **latest p
 - **2026-08-001 (CE)** - Adobe Commerce monthly isolated security release, August 2026. CE-only; EE/B2B variants not currently included in this package.
 - **2026-09-001 (CE)** - Adobe Commerce monthly isolated security release, September 2026. CE-only; EE/B2B variants not currently included in this package.
 - **2026-10-001 (CE)** - Adobe Commerce monthly isolated security release, October 2026. CE-only; EE/B2B variants not currently included in this package. Not for 2.4.6-p15: Adobe restricts that file to Adobe Commerce licence holders.
+- **2026-10-002 (CE)** - 2.4.8-p5 only. The `EmailAddress.php` fix (CVE-2026-91013) that the 2.4.7-p10 and 2.4.9 October patches already contain, which Adobe split out of `2026-10-001` for 2.4.8-p5.
 
 For detailed information on each patch, see the patches in [patches/isolated/](patches/isolated/).
 

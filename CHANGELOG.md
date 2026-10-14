@@ -4,7 +4,13 @@ Notable changes, newest first.
 
 ## Unreleased
 
-Nothing yet.
+### Changed
+
+- Adobe split October's 2.4.8-p5 patch in two. `2026-10-001` is back to its
+  first build, and the `vendor/magento/framework/Validator/EmailAddress.php`
+  change from `2026.10.14` now ships on its own as `2026-10-002`
+  (CVE-2026-91013). The patched code is the same; only the patch ids moved.
+  ([#22](https://github.com/SamJUK/m2-meta-security-patches/pull/22))
 
 ## 2026.10.14 — 2026-10-14
 

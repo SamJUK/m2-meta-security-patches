@@ -78,12 +78,12 @@ acme/magento-licensed-patches
             "lines": {
                 "2.4.6-p15": {
                     "base": { "magento/magento2-base": "2.4.6-p15" },
+                    "cumulative": true,
                     "patches": [
                         {
                             "id": "2026-10-001",
                             "label": "October Isolated",
-                            "source": "patches/246p15-2026-10-001-CE.diff",
-                            "depends": ["2026-09-001", "APSB26-146"]
+                            "source": "patches/246p15-2026-10-001-CE.diff"
                         }
                     ]
                 }
@@ -92,6 +92,8 @@ acme/magento-licensed-patches
     }
 }
 ```
+
+Requiring this package is what puts yours on top of it: a package's patches apply after those of the packages it requires, and are checked as built on the ones they share a file with. No `depends` needed. Each month, append the new file to the list: `cumulative` makes the order you list them the order they apply.
 
 Then in each store, trust it alongside this one and require it:
 
@@ -102,16 +104,12 @@ composer require acme/magento-licensed-patches
 
 A private Git repository used as a Composer `vcs` repository is enough to host it. Each store still needs its own Adobe Commerce licence: the package shares the work of keeping the files current, not the licence.
 
-Requiring this package also settles which `2026-09-001` you mean, should another package you trust declare one too.
-
-`depends` matters more here than in a project's `composer.json`. Between two packages, a missing `depends` is only a warning, and the two patches apply in an undefined order. In our test, leaving it out applied October before July and September, both of which then conflicted, and the store failed `verify`.
-
 ## What about 2.4.4 and 2.4.5?
 
 There is no monthly chain here for those lines to build on, so declare the whole chain yourself, as a `cumulative` line like the [Adobe Commerce example](adobe-commerce-and-b2b.md#how-do-i-patch-an-adobe-commerce-store). This package still applies the hotfixes that cover them.
 
 ## What we have tested
 
-Both layouts above, on a 2.4.6-p15 store with Adobe's real October file. With `depends`, all 22 files applied on top of September, and the store stayed clean through a further install, a package reinstall and a fresh `vendor/`. Without it, the project's `composer.json` version was refused, leaving this package's patches in place, and the private package version conflicted as described above.
+Both layouts above, on a 2.4.6-p15 store with Adobe's real October file. Both applied all 22 files on top of September, and the store stayed clean through a further install, a package reinstall and a fresh `vendor/`. Leaving `depends` out of the project's `composer.json` got the patch refused, leaving this package's patches in place.
 
 We have not tested 2.4.4 or 2.4.5.

@@ -1,6 +1,6 @@
 # Extended support
 
-2.4.6 reached end of life on 11th August 2026, and Adobe still patches it. From October 2026 those patches go to Adobe Commerce licence holders only, as every 2.4.4-p18 and 2.4.5-p17 patch in Adobe's registry does. The registry marks them `"entitlements": ["ee"]`, and downloading one without a licence gets a login page.
+2.4.6 reached end of life on 11th August 2026, and Adobe still patches it. From October 2026 its monthly patches go to Adobe Commerce licence holders only, as every 2.4.4-p18 and 2.4.5-p17 monthly patch in Adobe's registry does. The registry marks them `"entitlements": ["ee"]`, and downloading one without a licence gets a login page. (It has since marked September's 2.4.6-p15 file the same way. That one was public when Adobe released it, so it stays here.)
 
 This package only ships files that were public when Adobe released them, so it stops where the restriction starts:
 
@@ -106,7 +106,7 @@ A private Git repository used as a Composer `vcs` repository is enough to host i
 
 ## What about 2.4.4 and 2.4.5?
 
-There is no monthly chain here for those lines to build on, so declare the whole chain yourself, as a `cumulative` line like the [Adobe Commerce example](adobe-commerce-and-b2b.md#how-do-i-patch-an-adobe-commerce-store). This package still applies the hotfixes that cover them.
+There is no monthly chain here for those lines to build on, so declare the whole chain yourself, as a `cumulative` line like the [Adobe Commerce example](adobe-commerce-and-b2b.md#how-do-i-patch-an-adobe-commerce-store). This package still applies Polyshell to both. Its StyleSmuggler hotfix is only for 2.4.6-p15 and later, but Adobe's StyleSmuggler files for 2.4.4-p18 and 2.4.5-p17 are public, so add those as well.
 
 ## What we have tested
 

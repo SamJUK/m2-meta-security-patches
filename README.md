@@ -22,7 +22,7 @@ composer require samjuk/m2-meta-security-patches:">=2026.02.01"
 composer magento-patches:status
 ```
 
-Both `config` lines are needed. Without the first, Composer skips the patcher without a word; without the second, the patcher ignores this package. [Why both](docs/usage.md#install).
+Both `config` lines are needed. Without the first, Composer stops with an error, or skips the patcher without a word if the plugin was ever refused. Without the second, the install fails asking you to trust this package. [Why both](docs/usage.md#install).
 
 Then add `composer magento-patches:verify` to your deploy pipeline as its own step, so a build that applied nothing cannot pass. [Why it has to be separate](docs/usage.md#in-a-deploy-pipeline).
 

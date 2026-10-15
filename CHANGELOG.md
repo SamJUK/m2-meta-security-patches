@@ -4,6 +4,12 @@ Notable changes, newest first.
 
 ## Unreleased
 
+### Fixed
+
+- **Security.** The `2026.10.14` upgrade notes said `composer install` recovers a
+  `vaimo/composer-patches` update that stopped partway. It leaves Magento's root
+  files undeployed: run `composer reinstall magento/magento2-base` instead.
+
 ### Removed
 
 - **Security.** Mage-OS is no longer supported, and Composer refuses to install

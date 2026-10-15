@@ -4,6 +4,10 @@ Notable changes, newest first.
 
 ## Unreleased
 
+Nothing yet.
+
+## 2026.10.15 — 2026-10-15
+
 ### Fixed
 
 - **Security.** The `2026.10.14` upgrade notes said `composer install` recovers a

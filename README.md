@@ -28,6 +28,8 @@ Then add `composer magento-patches:verify` to your deploy pipeline as its own st
 
 Updating from a release before `2026.10.09`? Those two lines are also what that update needs. [Upgrading from vaimo/composer-patches](docs/usage.md#upgrading-from-vaimocomposer-patches).
 
+Using an AI coding agent? Point it at [Installing with an AI agent](docs/install-with-an-agent.md), which walks it through the checks, the install and what to report back.
+
 ## What does it cover?
 
 | Magento | Monthly isolated patches | Out-of-band hotfixes |
@@ -52,6 +54,7 @@ What we recommend instead: use [samjuk/magento-patch-installer](https://github.c
 ## Documentation
 
 - [Usage](docs/usage.md): installing, checking a store, deploy pipelines, patches that revert themselves, upgrading from vaimo/composer-patches
+- [Installing with an AI agent](docs/install-with-an-agent.md): steps written for a coding agent to follow, and the prompt to give it
 - [Included patches](docs/patches.md): every patch, how the monthly chain works, checking the files against Adobe's registry
 - [Adobe Commerce and B2B](docs/adobe-commerce-and-b2b.md): bringing your own licensed patches
 - [Extended support](docs/extended-support.md): adding the months Adobe restricts to licence holders, on top of this package

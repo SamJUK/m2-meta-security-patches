@@ -4,7 +4,10 @@ Notable changes, newest first.
 
 ## Unreleased
 
-Nothing yet.
+### Added
+
+- [Installing with an AI agent](docs/install-with-an-agent.md): the install and
+  upgrade steps written for a coding agent to follow, with the prompt to give it.
 
 ## 2026.10.15 — 2026-10-15
 

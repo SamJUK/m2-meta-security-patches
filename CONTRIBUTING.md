@@ -28,7 +28,7 @@ FROM=none TO=2026.10.13 bash tests/upgrade.sh 2.4.9               # fresh instal
 
 The full matrix takes a lot of disk and time locally. CI runs it:
 
-- **Pull requests:** add the `run-tests` label.
+- **Pull requests:** every one that changes something a store installs.
 - **master:** every push that changes something a store installs.
 - **Releases:** publishing one installs it from Packagist, fresh and as an update, on every isolated line. Re-run with `gh workflow run post-release.yml -f version=<version>`.
 

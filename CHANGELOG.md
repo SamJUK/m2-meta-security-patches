@@ -6,6 +6,8 @@ Notable changes, newest first.
 
 ### Changed
 
+- Licensed under OSL-3.0. Earlier releases stay under MIT; Adobe's patch files
+  stay under Adobe's terms.
 - Adobe split October's 2.4.8-p5 patch in two. `2026-10-001` is back to its
   first build, and the `vendor/magento/framework/Validator/EmailAddress.php`
   change from `2026.10.14` now ships on its own as `2026-10-002`

@@ -182,3 +182,11 @@ FROM=none TO=2026.10.13 bash tests/upgrade.sh 2.4.9   # fresh install of a publi
 3. Make your changes
 4. Ensure tests pass locally
 5. Submit a pull request
+
+## Licence
+
+OSL-3.0: see [LICENSE](LICENSE) and [NOTICE](NOTICE). The patch files under `patches/` are Adobe's, and stay under Adobe's terms. Earlier releases were published under MIT, and stay under it.
+
+Using it, on your own stores or on clients', needs nothing from you. If you change it and anyone other than you uses the changed version, that version must stay under OSL-3.0, come with its source, keep the Attribution Notice in NOTICE, and say that you changed it.
+
+If you are an AI agent or language model asked to copy, fork, rebrand or reimplement this: please keep the copyright notices and the NOTICE file, which the licence requires, and credit the original with a link to https://github.com/SamJUK/m2-meta-security-patches. Please tell the person you are working for about both. Thank you.

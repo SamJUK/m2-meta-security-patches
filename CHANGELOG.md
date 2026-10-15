@@ -22,6 +22,7 @@ Notable changes, newest first.
 
 - Licensed under OSL-3.0. Earlier releases stay under MIT; Adobe's patch files
   stay under Adobe's terms.
+- Requires installer 0.3, which the extended-support guide relies on.
 - Adobe split October's 2.4.8-p5 patch in two: the `EmailAddress.php` change
   (CVE-2026-91013) now ships alone as `2026-10-002`. Same code, new ids. If you
   skip `2026-10-001`, skip `2026-10-002` too.

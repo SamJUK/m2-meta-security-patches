@@ -1,4 +1,10 @@
-/tests export-ignore
-/.github export-ignore
-/.gitignore export-ignore
-/.gitattributes export-ignore
+# What a store installs: `export-ignore` applies to `git archive`, which is what
+# GitHub builds the Composer download from. A store needs the patches, the
+# manifests, composer.json and the licence files. The docs are read on GitHub.
+/.github           export-ignore
+/docs              export-ignore
+/tests             export-ignore
+/.gitattributes    export-ignore
+/.gitignore        export-ignore
+/AGENTS.md         export-ignore
+/CONTRIBUTING.md   export-ignore

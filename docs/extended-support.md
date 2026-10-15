@@ -32,7 +32,7 @@ Declare the month on the same line as this package's chain, and name what it bui
 ```json
 "extra": {
     "magento-patches": {
-        "trust": ["samjuk/*"],
+        "trust": ["samjuk/m2-meta-security-patches"],
         "lines": {
             "2.4.6-p15": {
                 "base": { "magento/magento2-base": "2.4.6-p15" },
@@ -98,13 +98,13 @@ Requiring this package is what puts yours on top of it: a package's patches appl
 Then in each store, trust it alongside this one and require it:
 
 ```sh
-composer config --json extra.magento-patches.trust '["samjuk/*", "acme/*"]'
+composer config --json extra.magento-patches.trust '["samjuk/m2-meta-security-patches", "acme/magento-licensed-patches"]'
 composer require acme/magento-licensed-patches
 ```
 
 A private Git repository used as a Composer `vcs` repository is enough to host it. Each store still needs its own Adobe Commerce licence: the package shares the work of keeping the files current, not the licence.
 
-To stop using it, take its patches off before removing it, or the months beneath them read as conflicts: see [removing a package that builds on another](https://github.com/SamJUK/magento-patch-installer#patches-from-several-sources).
+To stop using it, take its patches off before removing it, or the months beneath them read as conflicts: see [removing a package that builds on another](https://github.com/SamJUK/magento-patch-installer/blob/master/docs/declaring-patches.md#patches-from-several-sources).
 
 ## What about 2.4.4 and 2.4.5?
 

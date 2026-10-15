@@ -104,6 +104,8 @@ composer require acme/magento-licensed-patches
 
 A private Git repository used as a Composer `vcs` repository is enough to host it. Each store still needs its own Adobe Commerce licence: the package shares the work of keeping the files current, not the licence.
 
+To stop using it, take its patches off before removing it, or the months beneath them read as conflicts: see [removing a package that builds on another](https://github.com/SamJUK/magento-patch-installer#patches-from-several-sources).
+
 ## What about 2.4.4 and 2.4.5?
 
 There is no monthly chain here for those lines to build on, so declare the whole chain yourself, as a `cumulative` line like the [Adobe Commerce example](adobe-commerce-and-b2b.md#how-do-i-patch-an-adobe-commerce-store). This package still applies Polyshell to both. Its StyleSmuggler hotfix is only for 2.4.6-p15 and later, but Adobe's StyleSmuggler files for 2.4.4-p18 and 2.4.5-p17 are public, so add those as well.

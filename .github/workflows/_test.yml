@@ -3,6 +3,9 @@ name: Reusable Test Workflow
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   generate-matrix:
     runs-on: ubuntu-latest
@@ -12,7 +15,7 @@ jobs:
       lines: ${{ steps.set-lines.outputs.lines }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Generate test matrix
         id: set-matrix
@@ -29,7 +32,7 @@ jobs:
               php_version: .value
             }
           ]')
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 
       # One per isolated base line: the versions a monthly patch lands on.
       - name: List the isolated lines
@@ -47,7 +50,7 @@ jobs:
     name: Test ${{ matrix.package }}:${{ matrix.magento_version }}-${{ matrix.php_version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Retried only when the failure names a network problem. A blanket retry
       # would run a genuinely flaky patch three times and report the run that
@@ -103,7 +106,7 @@ jobs:
     name: Upgrade ${{ matrix.magento_version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Upgrade from the newest release
         run: bash tests/upgrade.sh "${{ matrix.magento_version }}"

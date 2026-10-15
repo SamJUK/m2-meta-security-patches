@@ -6,19 +6,19 @@ Patches are applied by [samjuk/magento-patch-installer](https://github.com/SamJU
 
 ```bash
 composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true
-composer config --json extra.magento-patches.trust '["samjuk/*"]'
+composer config --json extra.magento-patches.trust '["samjuk/m2-meta-security-patches"]'
 composer require samjuk/m2-meta-security-patches:">=2026.02.01"
 ```
 
 **Why allow the plugin?** Composer only runs plugins it has been told to trust. In a terminal it asks. In CI it stops with an error naming the plugin. If anyone ever answered "n" to that question, or set the entry to `false`, Composer skips the plugin without a word and exits `0` having applied no patches.
 
-**Why trust the package?** Patching from dependencies is opt-in. Nothing outside your own `composer.json` is read until you name it, so this is the line that switches the package on. It writes:
+**Why trust the package?** Patching from dependencies is opt-in. Nothing outside your own `composer.json` is read until you name it, so this is the line that switches the package on. Name the package itself rather than a pattern such as `samjuk/*`: a trusted package can write to any file in the project, and a pattern would extend that to whatever else matches it later. It writes:
 
 ```json
 {
   "extra": {
     "magento-patches": {
-      "trust": ["samjuk/*"]
+      "trust": ["samjuk/m2-meta-security-patches"]
     }
   }
 }

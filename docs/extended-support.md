@@ -32,7 +32,7 @@ Declare the month on the same line as this package's chain, and name what it bui
 ```json
 "extra": {
     "magento-patches": {
-        "trust": ["samjuk/*"],
+        "trust": ["samjuk/m2-meta-security-patches"],
         "lines": {
             "2.4.6-p15": {
                 "base": { "magento/magento2-base": "2.4.6-p15" },
@@ -98,7 +98,7 @@ Requiring this package is what puts yours on top of it: a package's patches appl
 Then in each store, trust it alongside this one and require it:
 
 ```sh
-composer config --json extra.magento-patches.trust '["samjuk/*", "acme/*"]'
+composer config --json extra.magento-patches.trust '["samjuk/m2-meta-security-patches", "acme/magento-licensed-patches"]'
 composer require acme/magento-licensed-patches
 ```
 

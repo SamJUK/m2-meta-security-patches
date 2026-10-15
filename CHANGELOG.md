@@ -4,6 +4,13 @@ Notable changes, newest first.
 
 ## Unreleased
 
+### Changed
+
+- The docs trust this package by name, `"samjuk/m2-meta-security-patches"`,
+  rather than `samjuk/*`. A trusted package can write to any file in the project,
+  so a pattern trusts more than it needs to. Stores that already trust
+  `samjuk/*` keep working.
+
 ### Added
 
 - [Installing with an AI agent](docs/install-with-an-agent.md): the install and

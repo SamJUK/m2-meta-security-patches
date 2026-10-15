@@ -89,7 +89,7 @@ test_configuration() {
     fi
 
     TEST_OUTPUT=$(docker exec "$CONTAINER_NAME" sh -c "
-        composer config --json extra.magento-patches.trust '[\"samjuk/*\"]' \
+        composer config --json extra.magento-patches.trust '[\"samjuk/m2-meta-security-patches\"]' \
         && composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true \
         && composer require samjuk/m2-meta-security-patches:@dev --no-interaction -W -vvv \
         && composer magento-patches:status -v \

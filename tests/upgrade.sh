@@ -74,7 +74,7 @@ step() {
 # vaimo 6.0.2 -> 6.0.3 mid-run fatals on its own half-replaced classes.
 step "configure like a stock store" "if php -r 'exit(isset(json_decode(file_get_contents(\"composer.json\"), true)[\"require-dev\"][\"vaimo/composer-patches\"]) ? 0 : 1);'; \
         then composer remove --dev vaimo/composer-patches --no-interaction; fi \
-    && composer config --json extra.magento-patches.trust '[\"samjuk/*\"]' \
+    && composer config --json extra.magento-patches.trust '[\"samjuk/m2-meta-security-patches\"]' \
     && composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true \
     && composer config --no-plugins allow-plugins.vaimo/composer-patches true"
 

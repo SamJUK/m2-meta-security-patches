@@ -17,7 +17,7 @@ Adobe's security patches for Magento Open Source, as one Composer package. Every
 
 ```bash
 composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true
-composer config --json extra.magento-patches.trust '["samjuk/*"]'
+composer config --json extra.magento-patches.trust '["samjuk/m2-meta-security-patches"]'
 composer require samjuk/m2-meta-security-patches:">=2026.02.01"
 composer magento-patches:status
 ```

@@ -44,10 +44,10 @@ Read `extra.magento-patches.trust` in `composer.json` first. If it does not exis
 
 ```bash
 composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true
-composer config --json extra.magento-patches.trust '["samjuk/*"]'
+composer config --json extra.magento-patches.trust '["samjuk/m2-meta-security-patches"]'
 ```
 
-If `trust` already lists other packages, run only the first command, and add `"samjuk/*"` to the existing list by editing `composer.json`. The second command replaces the list.
+If `trust` already lists other packages, run only the first command, and add `"samjuk/m2-meta-security-patches"` to the existing list by editing `composer.json`. The second command replaces the list. If the list contains `"samjuk/*"` from earlier instructions, suggest replacing it with the package name.
 
 On an upgrade, both lines have to be in place before the update in step 3. Without them the update stops partway, with Magento's root files not deployed.
 

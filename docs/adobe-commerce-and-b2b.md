@@ -92,7 +92,7 @@ Each month, append the new files to the end of their lists. Adobe publishes on t
 Put the same files and manifests in a private Composer package, and trust it in each store by name:
 
 ```bash
-composer config --json extra.magento-patches.trust '["your-vendor/*"]'
+composer config --json extra.magento-patches.trust '["your-vendor/magento-licensed-patches"]'
 ```
 
 A private Git repository used as a Composer `vcs` repository is enough. Private Packagist, Satis and GitLab's package registry work too; GitHub Packages does not support Composer.

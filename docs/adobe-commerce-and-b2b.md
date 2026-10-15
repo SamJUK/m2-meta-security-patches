@@ -28,7 +28,7 @@ Use [samjuk/magento-patch-installer](https://github.com/SamJUK/magento-patch-ins
     composer require samjuk/magento-patch-installer
     ```
 
-2. Download Adobe's CE and EE files for your version from `https://repo.magento.com/patch/<file_name>`, using your own repo.magento.com credentials. Check each one's sha256 against the registry entry, as [this package does](patches.md#check-the-files-yourself). Keep them unmodified, in a directory of their own (`patches/` often exists already in a Magento project).
+2. Download Adobe's CE and EE files for your version from `https://repo.magento.com/patch/<file_name>`, using your own repo.magento.com credentials. Check each one's sha256 against the registry entry, as [this package does](patches.md#check-the-files-yourself). Keep them unmodified, each area's files beside the manifest that declares them (`adobe-patches/ce/`, `adobe-patches/ee/`): a manifest's `source` paths are read from its own directory.
 
 3. Declare them. One manifest per area keeps the chains apart. The CE months form a cumulative line, where the order listed is the order applied. The EE months name what each is built on, because they are not built on the CE months:
 
@@ -49,15 +49,15 @@ Use [samjuk/magento-patch-installer](https://github.com/SamJUK/magento-patch-ins
                 "base": { "magento/magento2-base": "2.4.9" },
                 "cumulative": true,
                 "patches": [
-                    { "id": "2026-07-001", "source": "249-2026-07-001-CE.patch" },
-                    { "id": "2026-08-001", "source": "249-2026-08-001-CE.patch" },
-                    { "id": "2026-09-001", "source": "249-2026-09-001-CE.patch" },
-                    { "id": "2026-10-001", "source": "249-2026-10-001-CE.patch" }
+                    { "id": "2026-07-001", "source": "249-2026-07-001-CE.diff" },
+                    { "id": "2026-08-001", "source": "249-2026-08-001-CE.diff" },
+                    { "id": "2026-09-001", "source": "249-2026-09-001-CE.diff" },
+                    { "id": "2026-10-001", "source": "249-2026-10-001-CE.diff" }
                 ]
             }
         },
         "patches": [
-            { "id": "APSB26-146", "label": "StyleSmuggler", "source": "VULN-39341-249.patch", "base": { "magento/magento2-base": "2.4.9" } }
+            { "id": "APSB26-146", "label": "StyleSmuggler", "source": "VULN-39341-249.diff", "base": { "magento/magento2-base": "2.4.9" } }
         ]
     }
     ```
@@ -85,7 +85,7 @@ Use [samjuk/magento-patch-installer](https://github.com/SamJUK/magento-patch-ins
 
 Each month, append the new files to the end of their lists. Adobe publishes on the second Tuesday.
 
-**What we have tested.** The layout above, with Adobe's real CE and EE files for 2.4.9, installs, applies the CE chain, orders the EE chain correctly, and stays clean on the runs after. We ran it on a Community Edition store, where the EE files' targets read as "not covered". We have no licensed Adobe Commerce or B2B store to test against, so the EE and B2B patches themselves have not been applied by us.
+**What we have tested.** On 15th October 2026, this layout on a real Adobe Commerce 2.4.8-p5 store with B2B 1.5.2-p5: Adobe's 13 CE, EE and B2B files from the registry, each sha256 checked, in three manifests. All 110 targets applied, `magento-patches:verify` exited `0`, and so did the `composer install` runs after. Reinstalling an EE module, a B2B module and `magento2-base` without plugins made verify fail, and the next apply put them back. The 95 patched PHP and XML files all parse.
 
 ## What about several stores?
 

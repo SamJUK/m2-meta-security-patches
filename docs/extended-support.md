@@ -104,7 +104,7 @@ composer require acme/magento-licensed-patches
 
 A private Git repository used as a Composer `vcs` repository is enough to host it. Each store still needs its own Adobe Commerce licence: the package shares the work of keeping the files current, not the licence.
 
-To stop using it, take its patches off before removing it, or the months beneath them read as conflicts: see [removing a package that builds on another](https://github.com/SamJUK/magento-patch-installer#patches-from-several-sources).
+To stop using it, take its patches off before removing it, or the months beneath them read as conflicts: see [removing a package that builds on another](https://github.com/SamJUK/magento-patch-installer/blob/master/docs/declaring-patches.md#patches-from-several-sources).
 
 ## What about 2.4.4 and 2.4.5?
 

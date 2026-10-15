@@ -85,7 +85,7 @@ composer magento-patches:verify; echo "exit code: $?"
 
 A conflict usually means a core file was changed locally, or another tool patched it differently. Do not resolve it by editing files, deleting the state file or skipping the patch. The person decides.
 
-Monthly patches only apply to the newest patch release of each Magento line. If `status` shows them as built for a newer patch release than the store's (2.4.8-p5 on a 2.4.8-p4 store, for example), tell the person that they will apply once Magento is upgraded, and that the out-of-band hotfixes that cover the store still apply now. An end-of-life warning in `status` is worth passing on as well.
+Monthly patches only apply to the newest patch release of each Magento line. If `status` warns that the store is behind (`magento/magento2-base is on 2.4.8-p4, but patches here are built for 2.4.8-p5`), tell the person that they will apply once Magento is upgraded, and that the out-of-band hotfixes that cover the store still apply now. An end-of-life warning in `status` is worth passing on as well.
 
 ## 5. Suggest a deploy check
 
@@ -100,7 +100,7 @@ It has to be a separate step. `composer install --no-plugins`, or a plugin refus
 ## When the person wants more
 
 - **Switch a patch off:** skip it in their own `composer.json`, with a written reason, as shown in [Switching a patch off](usage.md#switching-a-patch-off). Never remove a patch from `vendor/`.
-- **Add a patch of their own to one store:** declare it in the project's `composer.json` with `depends` naming what it builds on. See [Declaring Patches](https://github.com/SamJUK/magento-patch-installer#declaring-patches) and [Extended support](extended-support.md).
+- **Add a patch of their own to one store:** declare it in the project's `composer.json` with `depends` naming what it builds on. See [Declaring Patches](https://github.com/SamJUK/magento-patch-installer/blob/master/docs/declaring-patches.md) and [Extended support](extended-support.md).
 - **Add Adobe's restricted months, or patch several stores:** suggest a private package of their own that requires this one, kept in a private repository. See [Extended support](extended-support.md#several-stores-a-package-of-your-own). The files come from Adobe with the person's own repo.magento.com keys. Check each one's sha256 against Adobe's public registry, and keep it unmodified.
 
 ## Report back

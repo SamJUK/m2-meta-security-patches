@@ -73,7 +73,7 @@ If a patch breaks something you cannot fix straight away, skip it in your own `c
 }
 ```
 
-A skip takes the patch off disk, not just out of future installs, and every later month built on it goes with it. It stays visible in every report until you remove it. See [choosing which patches apply](https://github.com/SamJUK/magento-patch-installer#choosing-which-patches-apply).
+A skip takes the patch off disk, not just out of future installs, and every later month built on it goes with it. It stays visible in every report until you remove it. See [choosing which patches apply](https://github.com/SamJUK/magento-patch-installer/blob/master/docs/declaring-patches.md#choosing-which-patches-apply).
 
 The same applies if another patch package you trust ships a fix that clashes with one here: skip one side, but only if the other really carries the same fix.
 

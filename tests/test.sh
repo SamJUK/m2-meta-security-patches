@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Sam James. Licensed under the Open Software License version 3.0.
+# SPDX-License-Identifier: OSL-3.0
+#
 # A simple bash script to test install the composer package across a range of Magento versions
 
 set -euo pipefail

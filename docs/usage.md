@@ -7,7 +7,7 @@ Patches are applied by [samjuk/magento-patch-installer](https://github.com/SamJU
 ```bash
 composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true
 composer config --json extra.magento-patches.trust '["samjuk/m2-meta-security-patches"]'
-composer require samjuk/m2-meta-security-patches:">=2026.02.01"
+composer require samjuk/m2-meta-security-patches:">=2026.10.15"
 ```
 
 **Why allow the plugin?** Composer only runs plugins it has been told to trust. In a terminal it asks. In CI it stops with an error naming the plugin. If anyone ever answered "n" to that question, or set the entry to `false`, Composer skips the plugin without a word and exits `0` having applied no patches.
@@ -24,7 +24,7 @@ composer require samjuk/m2-meta-security-patches:">=2026.02.01"
 }
 ```
 
-**Why `>=2026.02.01`?** Versions are release dates, so an open lower bound picks up every new month. Composer still filters out betas on stability.
+**Why `>=2026.10.15`?** Versions are release dates, so an open lower bound picks up every new month. Composer still filters out betas on stability. The floor is the first release that refuses Adobe Commerce, B2B and Mage-OS: below it, Composer installs an older release on those stores rather than failing (2026.09.08 on Adobe Commerce, 2026.10.14 on Mage-OS).
 
 ## Check a store
 

@@ -31,8 +31,8 @@ Note the Magento version from the third command (for example `2.4.8-p5`). The fo
 | What you found | What to do |
 |---|---|
 | `composer show magento/magento2-base` failed | Stop. This is not a Magento project, or not its root directory. |
-| `mage-os/framework` | Stop. Mage-OS is not supported, and Composer will refuse the install. Tell the person that Mage-OS ships its own security releases. |
-| `magento/product-enterprise-edition` or `magento/extension-b2b` | Stop. This package refuses to install on Adobe Commerce or B2B, because those editions need Adobe's licensed files. Walk the person through [Adobe Commerce and B2B](adobe-commerce-and-b2b.md) instead. |
+| `mage-os/framework` | Stop. Mage-OS is not supported. Do not install anyway: without the version floor below, Composer falls back to an older release rather than refusing. Tell the person that Mage-OS ships its own security releases. |
+| `magento/product-enterprise-edition` or `magento/extension-b2b` | Stop. This package is not for Adobe Commerce or B2B, because those editions need Adobe's licensed files. If it is already installed, it is a release from before it refused them: tell the person. Walk the person through [Adobe Commerce and B2B](adobe-commerce-and-b2b.md) instead. |
 | Magento before 2.4.2, PHP before 7.4, or Composer before 2.2 | Stop, and say which requirement is not met. |
 | `samjuk/m2-meta-security-patches` at a version before `2026.10.09`, or `vaimo/composer-patches` | This is an upgrade from the releases that used vaimo. Follow steps 2 to 5, using the upgrade command in step 3. |
 | `samjuk/m2-meta-security-patches` at `2026.10.09` or later | It is already installed. Go to step 4. |
@@ -56,10 +56,10 @@ On an upgrade, both lines have to be in place before the update in step 3. Witho
 A fresh install:
 
 ```bash
-composer require samjuk/m2-meta-security-patches:">=2026.02.01"
+composer require samjuk/m2-meta-security-patches:">=2026.10.15"
 ```
 
-An upgrade from the vaimo releases: check the constraint on `samjuk/m2-meta-security-patches` in `composer.json`. If it would not allow `2026.10.09` or later (an exact version such as `2026.09.08`, for example), ask the person before changing it to `>=2026.02.01`. Then:
+An upgrade from the vaimo releases: check the constraint on `samjuk/m2-meta-security-patches` in `composer.json`. If it would not allow `2026.10.09` or later (an exact version such as `2026.09.08`, for example), ask the person before changing it to `>=2026.10.15`. Then:
 
 ```bash
 composer update samjuk/m2-meta-security-patches --with-all-dependencies

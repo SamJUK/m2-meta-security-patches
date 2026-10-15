@@ -101,7 +101,7 @@ if [ "$TO" = working ]; then
         '{\"type\": \"path\", \"url\": \"/next\", \"canonical\": false, \"options\": {\"symlink\": false}}'"
 fi
 
-step "update to $EXPECT, as the README says" "composer require '$PKG:>=2026.02.01' --no-update --no-interaction \
+step "update to $EXPECT, as the README says" "composer require '$PKG:>=2026.10.15' --no-update --no-interaction \
     && composer update $PKG --no-interaction -W"
 step "installed $EXPECT" "composer show $PKG | grep -qE '^versions : \* $EXPECT\$'"
 step "verify after the update" "composer magento-patches:verify --no-interaction"

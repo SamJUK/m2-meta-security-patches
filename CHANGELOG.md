@@ -10,6 +10,10 @@ Notable changes, newest first.
   rather than `samjuk/*`. A trusted package can write to any file in the project,
   so a pattern trusts more than it needs to. Stores that already trust
   `samjuk/*` keep working.
+- The install command's floor is now `>=2026.10.15`, the first release that
+  refuses Adobe Commerce, B2B and Mage-OS. With `>=2026.02.01`, Composer
+  installed 2026.09.08 on Adobe Commerce and 2026.10.14 on Mage-OS instead of
+  failing. A Commerce store with a release up to 2026.09.08 should remove it.
 
 ### Added
 

@@ -1,6 +1,6 @@
 # Adobe Commerce and B2B
 
-This package is Community Edition only. Its `composer.json` conflicts with `magento/product-enterprise-edition` and `magento/product-b2b-edition`, so Composer refuses to install it on an Adobe Commerce or B2B store. Two reasons:
+This package is Community Edition only. Since 2026.09.11-beta1 its `composer.json` conflicts with `magento/product-enterprise-edition` and `magento/product-b2b-edition`, so the [install command](usage.md#install) refuses an Adobe Commerce or B2B store. The vaimo-based releases up to 2026.09.08 have no such conflict: without a version floor, Composer installs 2026.09.08 on Adobe Commerce rather than failing. If your store has one of those, remove it (`composer remove samjuk/m2-meta-security-patches`). Two reasons it is CE only:
 
 - **The files are Adobe's to distribute.** Adobe patches those editions with extra files that contain Adobe Commerce code. They download from Adobe today, but that does not make them a public package's to redistribute.
 - **Half the patches would look like all of them.** The Community Edition patches here apply cleanly to the code the editions share. On their own they would report an Adobe Commerce store as fully patched while its Commerce code went untouched.

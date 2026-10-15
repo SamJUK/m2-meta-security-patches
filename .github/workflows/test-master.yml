@@ -12,6 +12,7 @@ on:
       - '.github/workflows/post-release.yml'
       - 'docs/**'
       - 'LICENSE'
+      - 'bin/**'
       - '.claude/**'
       - '.github/dependabot.yml'
 

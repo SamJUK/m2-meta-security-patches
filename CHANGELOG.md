@@ -4,12 +4,32 @@ Notable changes, newest first.
 
 ## Unreleased
 
+Nothing yet.
+
+## 2026.10.15 — 2026-10-15
+
+### Fixed
+
+- **Security.** The `2026.10.14` upgrade notes said `composer install` recovers a
+  `vaimo/composer-patches` update that stopped partway. It leaves Magento's root
+  files undeployed: run `composer reinstall magento/magento2-base` instead.
+  Installer 0.3 warns when a patched root file is missing.
+
+### Removed
+
+- **Security.** Mage-OS is no longer supported, and Composer refuses to install
+  this on it. Its packages live under `vendor/mage-os/`, where Adobe's patches
+  find nothing, yet `verify` passed. Remove this with `composer remove
+  samjuk/m2-meta-security-patches` and take Mage-OS's own releases.
+
 ### Changed
 
-- Adobe split October's 2.4.8-p5 patch in two. `2026-10-001` is back to its
-  first build, and the `vendor/magento/framework/Validator/EmailAddress.php`
-  change from `2026.10.14` now ships on its own as `2026-10-002`
-  (CVE-2026-91013). The patched code is the same; only the patch ids moved.
+- Licensed under OSL-3.0. Earlier releases stay under MIT; Adobe's patch files
+  stay under Adobe's terms.
+- Requires installer 0.3, which the extended-support guide relies on.
+- Adobe split October's 2.4.8-p5 patch in two: the `EmailAddress.php` change
+  (CVE-2026-91013) now ships alone as `2026-10-002`. Same code, new ids. If you
+  skip `2026-10-001`, skip `2026-10-002` too.
   ([#22](https://github.com/SamJUK/m2-meta-security-patches/pull/22))
 
 ## 2026.10.14 — 2026-10-14

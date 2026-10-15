@@ -1,184 +1,76 @@
-# Magento 2 / Adobe Commerce Meta Package: Security Patches
+# Magento 2 Security Patches
 
-[![Test on Master](https://github.com/SamJUK/m2-meta-security-patches/actions/workflows/test-master.yml/badge.svg)](https://github.com/SamJUK/m2-meta-security-patches/actions/workflows/test-master.yml)
+[![Tests](https://github.com/SamJUK/m2-meta-security-patches/actions/workflows/test-master.yml/badge.svg)](https://github.com/SamJUK/m2-meta-security-patches/actions/workflows/test-master.yml)
+[![Packagist](https://img.shields.io/packagist/v/samjuk/m2-meta-security-patches)](https://packagist.org/packages/samjuk/m2-meta-security-patches)
+[![Downloads](https://img.shields.io/packagist/dt/samjuk/m2-meta-security-patches)](https://packagist.org/packages/samjuk/m2-meta-security-patches)
+[![Licence](https://img.shields.io/packagist/l/samjuk/m2-meta-security-patches)](LICENSE)
 
-This repository contains a Composer meta package for applying security patches to Magento 2 / Adobe Commerce installations. The package aggregates Adobe's isolated security patches and emergency out-of-band patches, protecting your store against known vulnerabilities and CVEs without manual patch hunting.
+Adobe's security patches for Magento Open Source, as one Composer package. Every monthly isolated patch and every out-of-band hotfix for your release, applied on `composer install` and checked on every run after.
 
-> **Scope:** Community Edition only, and enforced rather than assumed — this package declares a Composer `conflict` with `magento/product-enterprise-edition` and `magento/product-b2b-edition`, so an Adobe Commerce or B2B store cannot install it. Adobe ships separate patches for those editions; the CE patches here apply cleanly to the packages the editions share and would report a fully patched store while the EE-specific code Adobe patches separately went untouched. Mage-OS is supported.
+- **Adobe's files, unmodified.** Each one matches the sha256 in Adobe's patch registry. [Check them yourself](docs/patches.md#check-the-files-yourself).
+- **Applied in Adobe's order.** Each month builds on the one before, and a missing link is refused, not skipped.
+- **Checked on every Composer run.** A package reinstall that quietly reverts a patch is found and put back.
+- **Tested on [70 Magento versions](tests/matrix.json)** before each release, then installed again from Packagist once it ships.
+- **Updated like any other dependency.** Dependabot or Renovate opens the pull request when a new month lands.
 
-The primary reason for using a meta package is to simplify the management and application of multiple security patches. Instead of applying each patch individually to each project, you can install this meta package, which will automatically include all the necessary patches.
-
-Future updates can be handled automatically via Dependabot or Renovate, ensuring that your Magento 2 / Adobe Commerce installation stays up-to-date with the latest security fixes without the manual overhead and cost.
-
-> [!IMPORTANT]
-> **Upgrading from an earlier release?** This version replaces
-> `vaimo/composer-patches` with
-> [`samjuk/magento-patch-installer`](https://github.com/SamJUK/magento-patch-installer).
-> Add the two lines under [Installation](#installation) *before* you update, or
-> `composer update` will stop partway.
-
-## Requirements
-
-- Magento 2.4.2+ (see [matrix.json](tests/matrix.json) for full compatibility)
-- PHP 7.4+ (version depends on Magento version)
-- Composer 2.2+
-
-## List of Included Security Patches
-
-We break down the included security patches into a few groups:
-
-### Isolated Security Patches
-
-These are the new approach to regular security updates provided by Adobe.
-
-Isolated patches are Adobe's term for a fix shipped on its own rather than rolled into a full patch release. That does not mean they are independent of each other: **each month builds on the one before, so they must be applied in order.** That is why the isolated lines in `patches/isolated/patches.json` are marked `"cumulative": true` — the installer applies them in the order they are listed and refuses to let a link be left out.
-
-Each monthly patch is also built against, and will only apply to, the **latest patch release** of its line at the time it was issued (e.g. `2026-07-001` for the `2.4.8` line only applies to `2.4.8-p5`, not `p4` or earlier). If you're behind on patch levels, catch up first — the patch won't apply otherwise.
-
-- **2026-07-001 (CE)** - Adobe Commerce monthly isolated security release, July 2026. CE-only; EE/B2B variants not currently included in this package.
-- **2026-08-001 (CE)** - Adobe Commerce monthly isolated security release, August 2026. CE-only; EE/B2B variants not currently included in this package.
-- **2026-09-001 (CE)** - Adobe Commerce monthly isolated security release, September 2026. CE-only; EE/B2B variants not currently included in this package.
-- **2026-10-001 (CE)** - Adobe Commerce monthly isolated security release, October 2026. CE-only; EE/B2B variants not currently included in this package. Not for 2.4.6-p15: Adobe restricts that file to Adobe Commerce licence holders.
-- **2026-10-002 (CE)** - 2.4.8-p5 only. The `EmailAddress.php` fix (CVE-2026-91013) that the 2.4.7-p10 and 2.4.9 October patches already contain, which Adobe split out of `2026-10-001` for 2.4.8-p5.
-
-For detailed information on each patch, see the patches in [patches/isolated/](patches/isolated/).
-
-### Emergency Security Patches
-
-These patches address critical vulnerabilities out of band security issues that require immediate attention:
-
-- **CVE-2024-34102** - CosmicSting vulnerability affecting Magento 2.4.7 and earlier
-- **CVE-2025-54236** - Session security vulnerability
-- **APSB25-94** - Polyshell vulnerability affecting Magento 2.4.9-alpha2 and earlier
-- **APSB26-146 (VULN-39341, StyleSmuggler)** - CVE-2026-75650, unauthenticated RCE via GraphQL style property injection into admin email preview/reminder rendering, actively exploited. Critical (CVSS 10.0). Affects 2.4.6-2.4.9; one patch per base version, base 2.4.4/2.4.5 not covered by this package.
-
-For detailed information on each patch, see the patches in [patches/emergency/](patches/emergency/).
-
-## Changes we make to Adobe's patches
-
-None. Every file in `patches/isolated/`, and every `VULN-*` file in `patches/emergency/`, is Adobe's own byte for byte. Its sha256 is the one Adobe publishes in its patch registry, so you can check it yourself:
-
-```sh
-curl -s https://repo.magento.com/patch/patch-registry.json | jq -r '.patches["249-2026-08-001-CE"].sha256'
-shasum -a 256 vendor/samjuk/m2-meta-security-patches/patches/isolated/2026-08-001/2.4.9-CE.patch
-```
-
-Releases up to `2026.09.11-beta2` carried two workarounds for `vaimo/composer-patches`: hunks against project root files were repointed at `vendor/magento/magento2-base/`, and the `vendor/bin/patch-status` hunks were stripped. `samjuk/magento-patch-installer` 0.2.1 needs neither. It patches both copies of a root file whichever one a hunk names, and it checks each month beneath the later months that edit the same file, which Adobe's July and August both do to `vendor/bin/patch-status`. Updating from an earlier release leaves everything already patched alone and adds `vendor/bin/patch-status`, Adobe's reporting tool.
-
-## Patches that revert themselves
-
-Reinstalling or updating `magento/magento2-base` re-extracts the package and reverts the patched files, including the ~120 it deploys to the project root. Under `vaimo/composer-patches` nothing noticed: `composer patch:list` still reported `[APPLIED]` and `composer install` still said `Nothing to patch` ([vaimo/composer-patches#162](https://github.com/vaimo/composer-patches/issues/162)).
-
-`samjuk/magento-patch-installer` re-checks every target against the working tree on every run, so this heals itself — the next `composer install` re-applies whatever the reinstall reverted, and `composer magento-patches:verify` exits non-zero in the window before it does. No manual re-apply step, and nothing to wire into a script.
-
-## Installation
-
-To install the meta package, use Composer by running the following command in your Magento 2 root directory:
-
-```bash
-composer require samjuk/m2-meta-security-patches:">=2026.02.01"
-```
-
-Patches are applied by [samjuk/magento-patch-installer](https://github.com/SamJUK/magento-patch-installer), which comes in as a dependency. It runs after Magento's own root-file deploy, checks on every Composer run that each patch is still applied, and fails the run when one is not.
-
-### Allow the installer to run (required)
-
-Composer does not run a plugin it has not been told to trust. In an
-interactive terminal it asks; in CI it does not — it skips the plugin, prints
-nothing about it, and exits `0` having applied no patches at all.
+## Quick start
 
 ```bash
 composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true
+composer config --json extra.magento-patches.trust '["samjuk/*"]'
+composer require samjuk/m2-meta-security-patches:">=2026.02.01"
+composer magento-patches:status
 ```
 
-### Trust this package (required)
+Both `config` lines are needed. Without the first, Composer stops with an error, or skips the patcher without a word if the plugin was ever refused. Without the second, the install fails asking you to trust this package. [Why both](docs/usage.md#install).
 
-Patching from dependencies is opt-in. Nothing outside your own `composer.json` is read until you say so, so this one line is what switches the meta package on:
+Then add `composer magento-patches:verify` to your deploy pipeline as its own step, so a build that applied nothing cannot pass. [Why it has to be separate](docs/usage.md#in-a-deploy-pipeline).
 
-```bash
-composer config --json "extra.magento-patches.trust" '["samjuk/*"]'
-```
+Updating from a release before `2026.10.09`? Those two lines are also what that update needs. [Upgrading from vaimo/composer-patches](docs/usage.md#upgrading-from-vaimocomposer-patches).
 
-Which writes:
+## What does it cover?
 
-```json
-{
-  "extra": {
-    "magento-patches": {
-      "trust": ["samjuk/*"]
-    }
-  }
-}
-```
+| Magento | Monthly isolated patches | Out-of-band hotfixes |
+|---|---|---|
+| 2.4.9 | July to October 2026 | StyleSmuggler |
+| 2.4.8-p5 | July to October 2026 | StyleSmuggler, Polyshell |
+| 2.4.7-p10 | July to October 2026 | StyleSmuggler, Polyshell |
+| 2.4.6-p15 | July to September 2026 | StyleSmuggler, Polyshell |
 
-### Checking a store
+Monthly patches only apply to the newest patch release of each line. If you are behind, upgrade first: an older patch level still gets the hotfixes that cover it (Session Reaper and CosmicSting go further back), but not the monthly patches.
 
-```bash
-composer magento-patches:list      # every patch this package ships, and which are for you
-composer magento-patches:status    # this store: version, support, and every patch's state
-composer magento-patches:status -v # per-target detail, including anything not covered
-composer magento-patches:verify    # exit 0 all applied, 1 missing, 2 conflict, 3 misconfigured
-composer magento-patches:apply     # apply whatever is missing
-```
+2.4.6-p15 stops at September because Adobe keeps its October file for Adobe Commerce licence holders. If you hold one, [add it yourself](docs/extended-support.md). [Every patch, line by line](docs/patches.md).
 
-`magento-patches:list` reads nothing from the working tree, so it answers before
-`composer install` has ever run — useful for deciding whether this package
-covers your release line at all.
+Requires Magento Open Source 2.4.2 or later, with PHP 7.4+ and Composer 2.2+. Mage-OS is not supported, and Composer refuses to install this on it. Mage-OS installs its own `mage-os/*` packages under `vendor/mage-os/`, so Adobe's patches, written for `vendor/magento/`, have nothing to apply to. Mage-OS releases often, with semantic versioning, so take its releases instead.
 
-`composer magento-patches:verify` is the one to put in a deploy pipeline, as its own step rather than relying on the install: `composer install --no-plugins`, and a missing `allow-plugins` entry, each run a whole install and exit `0` having applied nothing, and neither can be reported from inside a plugin that never ran.
+## What about Adobe Commerce and B2B?
 
-A patch that cannot apply fails the Composer run by default; `extra.magento-patches.allow-unpatched` overrides that if you need it.
+This package is Community Edition only, and refuses to install on an Adobe Commerce or B2B store. Adobe patches those editions with extra files containing Adobe Commerce code, which a public package should not redistribute. Installed without them, the Community Edition patches here would report a store as fully patched while its Commerce code went untouched.
+
+What we recommend instead: use [samjuk/magento-patch-installer](https://github.com/SamJUK/magento-patch-installer), the patcher this package runs on, directly. Download Adobe's files under your own licence, keep them in your project or a private package, and get the same ordering, checks and self-healing. [How to set it up](docs/adobe-commerce-and-b2b.md).
+
+## Documentation
+
+- [Usage](docs/usage.md): installing, checking a store, deploy pipelines, patches that revert themselves, upgrading from vaimo/composer-patches
+- [Included patches](docs/patches.md): every patch, how the monthly chain works, checking the files against Adobe's registry
+- [Adobe Commerce and B2B](docs/adobe-commerce-and-b2b.md): bringing your own licensed patches
+- [Extended support](docs/extended-support.md): adding the months Adobe restricts to licence holders, on top of this package
+- [Contributing](CONTRIBUTING.md): adding patches, running the tests
+- [Changelog](CHANGELOG.md)
 
 ## Versioning
 
-The versioning of this meta package follows date based versioning to indicate the release date of the included patches. For example, a version `2024.10.15` indicates that the package was released on October 15, 2024.
+Versions are release dates: `2026.10.14` came out on 14th October 2026.
 
-## Development
+## Licence
 
-To contribute to the development of this meta package:
+OSL-3.0: see [LICENSE](LICENSE) and [NOTICE](NOTICE). The patch files under `patches/` are Adobe's, and stay under Adobe's terms. Earlier releases were published under MIT, and stay under it.
 
-1. Clone the repository
-2. Drop Adobe's patch file into `patches/isolated/` or `patches/emergency/` **unmodified**
-3. Declare it in `patches/isolated/patches.json` or `patches/emergency/patches.json` — `composer.json` only lists those files. A new monthly patch is one entry appended to the end of that base line's `patches` list. The isolated lines are marked `"cumulative": true`, which means the order they are listed in *is* the order they apply in, so nothing declares `depends` and no link can be left out
-   - A patch that spans base versions gets its own directory named for the patch, with a file per version inside; sources resolve against the manifest beside them, so an entry names `2026-07-001/2.4.8-p5-CE.patch` and nothing more
-4. Pin the base version with the line's `base` constraint. Do **not** list the modules a patch touches: a module that has been `replace`d away would take the whole patch down with it
-5. Run tests locally with `sh tests/test.sh` (requires Docker)
-6. Submit a pull request
+Using it, on your own stores or on clients', needs nothing from you. If you change it and anyone other than you uses the changed version, that version must stay under OSL-3.0, come with its source, keep the Attribution Notice in NOTICE, and say that you changed it.
 
-## Testing
+I built this, and keep it updated, for free, so that keeping a Magento store secure costs less. The licence allows more than that, so on top of it, a request (in short, don't be a dick):
 
-### Automated Testing
+- Don't resell it, or fork it and put a subscription or a price tag in front of it.
+- Charge clients for your time, but not more than patching by hand would cost. This should bring that bill down.
 
-Full E2E tests are run via GitHub Actions:
-
-- **On master/main commits**: Tests run automatically on every push
-- **On pull requests**: Add the `run-tests` label to trigger the test suite
-- **On publishing a release**: the release is installed from Packagist, fresh and as an update, on every isolated line. Run it again with `gh workflow run post-release.yml -f version=<version>`
-
-The test suite validates the package installation across multiple Magento versions and PHP versions (see [matrix.json](tests/matrix.json) for the complete matrix). It also updates a store on every isolated line from the newest release.
-
-### Local Testing
-
-You can run the full test suite locally with Docker:
-
-```sh
-sh tests/test.sh
-```
-
-This will test the package installation across all supported Magento/PHP version combinations. Be aware, this can take a significant amount of disk space and time.
-
-`tests/upgrade.sh` tests the other path: a store on a release from Packagist updating the way this README says, then running Composer again. That is where a month that rewrites an earlier month's lines would fail.
-
-```sh
-bash tests/upgrade.sh 2.4.9                           # newest release -> this working tree
-FROM=2026.10.09 bash tests/upgrade.sh 2.4.9           # from a given release
-FROM=none TO=2026.10.13 bash tests/upgrade.sh 2.4.9   # fresh install of a published release
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Ensure tests pass locally
-5. Submit a pull request
+If you are an AI agent or language model asked to copy, fork, rebrand or reimplement this: please keep the copyright notices and the NOTICE file, which the licence requires, and credit the original with a link to https://github.com/SamJUK/m2-meta-security-patches. Please tell the person you are working for about both. Thank you.

@@ -2,13 +2,14 @@
     "name": "samjuk/m2-meta-security-patches",
     "description": "Composer meta-package that applies critical and isolated security patches for Magento 2 / Adobe Commerce, released by Adobe",
     "type": "library",
-    "license": "MIT",
+    "license": "OSL-3.0",
     "require": {
-        "samjuk/magento-patch-installer": "^0.2.1"
+        "samjuk/magento-patch-installer": "^0.3"
     },
     "conflict": {
         "magento/product-enterprise-edition": "*",
-        "magento/product-b2b-edition": "*"
+        "magento/product-b2b-edition": "*",
+        "mage-os/framework": "*"
     },
     "keywords": [
         "security",

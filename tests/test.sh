@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Sam James. Licensed under the Open Software License version 3.0.
+# SPDX-License-Identifier: OSL-3.0
+#
 # A simple bash script to test install the composer package across a range of Magento versions
 
 set -euo pipefail
@@ -17,7 +20,7 @@ usage() {
     echo "Options:"
     echo "  --summary            Show summary of test results"
     echo "  package              The composer package to test"
-    echo "  app-version          The Magento/MageOS version to test against"
+    echo "  app-version          The Magento version to test against"
     echo "  php-version          The PHP version to test against"
     exit 1
 }

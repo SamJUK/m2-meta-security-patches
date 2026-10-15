@@ -1,0 +1,16 @@
+samjuk/m2-meta-security-patches
+Copyright (c) 2026 Sam James
+Licensed under the Open Software License version 3.0
+
+Attribution Notice
+
+Originally developed by Sam James (SamJUK).
+Original project: https://github.com/SamJUK/m2-meta-security-patches
+
+This text is an "Attribution Notice" for the purposes of section 6 of the
+Open Software License 3.0. Keep it in the source code of any Derivative Work,
+and add a prominent notice there saying that you modified the Original Work.
+
+The patch files under patches/ are Adobe's security patches for Magento Open
+Source, which Adobe licenses under OSL-3.0 and AFL-3.0. They stay under
+Adobe's terms, and are not part of this licence grant.

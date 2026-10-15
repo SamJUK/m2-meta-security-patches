@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Sam James. Licensed under the Open Software License version 3.0.
+# SPDX-License-Identifier: OSL-3.0
+#
 # A store on a release from Packagist updates the way the README says, then keeps
 # running Composer. tests/test.sh covers fresh installs of the working tree.
 #

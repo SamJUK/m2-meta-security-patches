@@ -12,7 +12,7 @@ jobs:
       lines: ${{ steps.set-lines.outputs.lines }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Generate test matrix
         id: set-matrix
@@ -47,7 +47,7 @@ jobs:
     name: Test ${{ matrix.package }}:${{ matrix.magento_version }}-${{ matrix.php_version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Retried only when the failure names a network problem. A blanket retry
       # would run a genuinely flaky patch three times and report the run that
@@ -103,7 +103,7 @@ jobs:
     name: Upgrade ${{ matrix.magento_version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Upgrade from the newest release
         run: bash tests/upgrade.sh "${{ matrix.magento_version }}"

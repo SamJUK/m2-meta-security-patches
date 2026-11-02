@@ -6,25 +6,25 @@ Patches are applied by [samjuk/magento-patch-installer](https://github.com/SamJU
 
 ```bash
 composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true
-composer config --json extra.magento-patches.trust '["samjuk/*"]'
-composer require samjuk/m2-meta-security-patches:">=2026.02.01"
+composer config --json extra.magento-patches.trust '["samjuk/m2-meta-security-patches"]'
+composer require samjuk/m2-meta-security-patches:">=2026.10.15"
 ```
 
 **Why allow the plugin?** Composer only runs plugins it has been told to trust. In a terminal it asks. In CI it stops with an error naming the plugin. If anyone ever answered "n" to that question, or set the entry to `false`, Composer skips the plugin without a word and exits `0` having applied no patches.
 
-**Why trust the package?** Patching from dependencies is opt-in. Nothing outside your own `composer.json` is read until you name it, so this is the line that switches the package on. It writes:
+**Why trust the package?** Patching from dependencies is opt-in. Nothing outside your own `composer.json` is read until you name it, so this is the line that switches the package on. Name the package itself rather than a pattern such as `samjuk/*`: a trusted package can write to any file in the project, and a pattern would extend that to whatever else matches it later. It writes:
 
 ```json
 {
   "extra": {
     "magento-patches": {
-      "trust": ["samjuk/*"]
+      "trust": ["samjuk/m2-meta-security-patches"]
     }
   }
 }
 ```
 
-**Why `>=2026.02.01`?** Versions are release dates, so an open lower bound picks up every new month. Composer still filters out betas on stability.
+**Why `>=2026.10.15`?** Versions are release dates, so an open lower bound picks up every new month. Composer still filters out betas on stability. The floor is the first release that refuses Adobe Commerce, B2B and Mage-OS: below it, Composer installs an older release on those stores rather than failing (2026.09.08 on Adobe Commerce, 2026.10.14 on Mage-OS).
 
 ## Check a store
 
@@ -73,7 +73,7 @@ If a patch breaks something you cannot fix straight away, skip it in your own `c
 }
 ```
 
-A skip takes the patch off disk, not just out of future installs, and every later month built on it goes with it. It stays visible in every report until you remove it. See [choosing which patches apply](https://github.com/SamJUK/magento-patch-installer#choosing-which-patches-apply).
+A skip takes the patch off disk, not just out of future installs, and every later month built on it goes with it. It stays visible in every report until you remove it. See [choosing which patches apply](https://github.com/SamJUK/magento-patch-installer/blob/master/docs/declaring-patches.md#choosing-which-patches-apply).
 
 The same applies if another patch package you trust ships a fix that clashes with one here: skip one side, but only if the other really carries the same fix.
 

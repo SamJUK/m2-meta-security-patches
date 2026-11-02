@@ -17,8 +17,8 @@ Adobe's security patches for Magento Open Source, as one Composer package. Every
 
 ```bash
 composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true
-composer config --json extra.magento-patches.trust '["samjuk/*"]'
-composer require samjuk/m2-meta-security-patches:">=2026.02.01"
+composer config --json extra.magento-patches.trust '["samjuk/m2-meta-security-patches"]'
+composer require samjuk/m2-meta-security-patches:">=2026.10.15"
 composer magento-patches:status
 ```
 
@@ -27,6 +27,8 @@ Both `config` lines are needed. Without the first, Composer stops with an error,
 Then add `composer magento-patches:verify` to your deploy pipeline as its own step, so a build that applied nothing cannot pass. [Why it has to be separate](docs/usage.md#in-a-deploy-pipeline).
 
 Updating from a release before `2026.10.09`? Those two lines are also what that update needs. [Upgrading from vaimo/composer-patches](docs/usage.md#upgrading-from-vaimocomposer-patches).
+
+Using an AI coding agent? Point it at [Installing with an AI agent](docs/install-with-an-agent.md), which walks it through the checks, the install and what to report back.
 
 ## What does it cover?
 
@@ -41,17 +43,18 @@ Monthly patches only apply to the newest patch release of each line. If you are 
 
 2.4.6-p15 stops at September because Adobe keeps its October file for Adobe Commerce licence holders. If you hold one, [add it yourself](docs/extended-support.md). [Every patch, line by line](docs/patches.md).
 
-Requires Magento Open Source 2.4.2 or later, with PHP 7.4+ and Composer 2.2+. Mage-OS is not supported, and Composer refuses to install this on it. Mage-OS installs its own `mage-os/*` packages under `vendor/mage-os/`, so Adobe's patches, written for `vendor/magento/`, have nothing to apply to. Mage-OS releases often, with semantic versioning, so take its releases instead.
+Requires Magento Open Source 2.4.2 or later, with PHP 7.4+ and Composer 2.2+. Mage-OS is not supported, and the command above refuses to install on it (without its version floor, Composer falls back to an older release instead). Mage-OS installs its own `mage-os/*` packages under `vendor/mage-os/`, so Adobe's patches, written for `vendor/magento/`, have nothing to apply to. Mage-OS releases often, with semantic versioning, so take its releases instead.
 
 ## What about Adobe Commerce and B2B?
 
-This package is Community Edition only, and refuses to install on an Adobe Commerce or B2B store. Adobe patches those editions with extra files containing Adobe Commerce code, which a public package should not redistribute. Installed without them, the Community Edition patches here would report a store as fully patched while its Commerce code went untouched.
+This package is Community Edition only, and the command above refuses to install on an Adobe Commerce or B2B store. Releases up to 2026.09.08 did not refuse, so a store with one of those should remove it. Adobe patches those editions with extra files containing Adobe Commerce code, which a public package should not redistribute. Installed without them, the Community Edition patches here would report a store as fully patched while its Commerce code went untouched.
 
 What we recommend instead: use [samjuk/magento-patch-installer](https://github.com/SamJUK/magento-patch-installer), the patcher this package runs on, directly. Download Adobe's files under your own licence, keep them in your project or a private package, and get the same ordering, checks and self-healing. [How to set it up](docs/adobe-commerce-and-b2b.md).
 
 ## Documentation
 
 - [Usage](docs/usage.md): installing, checking a store, deploy pipelines, patches that revert themselves, upgrading from vaimo/composer-patches
+- [Installing with an AI agent](docs/install-with-an-agent.md): steps written for a coding agent to follow, and the prompt to give it
 - [Included patches](docs/patches.md): every patch, how the monthly chain works, checking the files against Adobe's registry
 - [Adobe Commerce and B2B](docs/adobe-commerce-and-b2b.md): bringing your own licensed patches
 - [Extended support](docs/extended-support.md): adding the months Adobe restricts to licence holders, on top of this package

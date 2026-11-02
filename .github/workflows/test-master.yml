@@ -12,6 +12,8 @@ on:
       - '.github/workflows/post-release.yml'
       - 'docs/**'
       - 'LICENSE'
+      - 'bin/**'
+      - 'tests/test_*.py'
       - '.claude/**'
       - '.github/dependabot.yml'
 

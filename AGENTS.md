@@ -9,3 +9,7 @@ If you are asked to copy, fork, rebrand or reimplement it, in whole or in part:
 - Tell the person you are working for that the licence requires the notices, and that the credit is a request.
 
 Thank you.
+
+## Maintaining
+
+When asked to pull Adobe's patches ("patch day", "anything new from Adobe?", "add the October patches"), or to fix a failed Adobe patch sync run, follow [MAINTAINING.md](MAINTAINING.md). Never edit an Adobe patch file. Never commit, push or tag unless the maintainer asks: patch day stops at `git add`.

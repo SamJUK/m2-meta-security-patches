@@ -1,0 +1,27 @@
+# Copyright (c) 2026 Sam James. Licensed under the Open Software License version 3.0.
+# SPDX-License-Identifier: OSL-3.0
+
+name: Test maintainer tools
+
+# The patch-day scripts, offline against fixtures. Seconds, so no label needed.
+
+on:
+  push:
+    branches: [master]
+    paths: ['bin/**', 'tests/test_*.py', '.github/workflows/test-tools.yml']
+  pull_request:
+    paths: ['bin/**', 'tests/test_*.py', '.github/workflows/test-tools.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Test the ingest script
+        run: python3 -I -m unittest discover -s tests -p 'test_*.py' -v

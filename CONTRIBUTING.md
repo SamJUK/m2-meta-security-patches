@@ -4,7 +4,9 @@ Issues and pull requests are welcome: a patch that will not apply, a store it mi
 
 ## Adding a patch
 
-1. Put Adobe's file in `patches/isolated/` or `patches/emergency/` **unmodified**. Its sha256 must match Adobe's [patch registry](https://repo.magento.com/patch/patch-registry.json).
+Monthly patches arrive on their own: a nightly workflow pulls them from Adobe's registry and opens a pull request (see [Testing](#testing)). Do it by hand with `python3 -I bin/ingest-adobe-patches.py`, which does steps 1 and 2 for every base line and reports anything that needs a decision. [MAINTAINING.md](MAINTAINING.md) covers the rest.
+
+1. Put Adobe's file in `patches/isolated/` or `patches/emergency/` **unmodified**. Its sha256 must match Adobe's [patch registry](https://repo.magento.com/patch/patch-registry.json). A hotfix the registry does not list gets its sha256 in `patches/SHA256SUMS`. `bash bin/check-patch-hashes.sh` checks every file.
 2. Declare it in `patches/isolated/patches.json` or `patches/emergency/patches.json`. `composer.json` only points at those two files.
    - A new monthly patch is one entry at the end of its base line's `patches` list. The isolated lines are `cumulative`, so the order listed is the order applied, and nothing declares `depends`.
    - A patch that covers several base versions gets a directory named for the patch, with a file per version: `2026-07-001/2.4.8-p5-CE.patch`. Sources resolve against the manifest beside them.
@@ -17,6 +19,7 @@ Issues and pull requests are welcome: a patch that will not apply, a store it mi
 Tests run real Magento installs in Docker, from the [samjuk/magento-ci-testing-env](https://github.com/SamJUK/magento-ci-testing-env) images.
 
 ```sh
+python3 -I -m unittest discover -s tests -p 'test_*.py'          # the ingest script, offline, in seconds
 sh tests/test.sh                                                  # fresh install on every version in tests/matrix.json
 bash tests/test.sh samjuk/magento-ci-testing-env 2.4.9 php8.5     # one version
 bash tests/upgrade.sh 2.4.9                                       # newest release -> this working tree
@@ -30,6 +33,7 @@ The full matrix takes a lot of disk and time locally. CI runs it:
 
 - **Pull requests:** every one that changes something a store installs.
 - **master:** every push that changes something a store installs.
+- **Nightly:** the Adobe patch sync checks every patch file against the registry and opens a pull request from `bot/adobe-patches` when Adobe publishes a new month, with the matrix run on it. It fails when the registry needs a decision; once made, add the start of its message to `.github/adobe-sync-acknowledged`. Run it on patch day with `gh workflow run adobe-sync.yml`. It needs "Allow GitHub Actions to create and approve pull requests" on, under Settings → Actions → General. Closing its pull request without merging does not decline a month: the next night opens it again, so record a decision instead.
 - **Releases:** publishing one installs it from Packagist, fresh and as an update, on every isolated line. Re-run with `gh workflow run post-release.yml -f version=<version>`.
 
 ## Pull requests

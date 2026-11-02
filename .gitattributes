@@ -8,3 +8,5 @@
 /.gitignore        export-ignore
 /AGENTS.md         export-ignore
 /CONTRIBUTING.md   export-ignore
+/MAINTAINING.md    export-ignore
+/bin               export-ignore

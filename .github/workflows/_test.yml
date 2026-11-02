@@ -2,6 +2,11 @@ name: Reusable Test Workflow
 
 on:
   workflow_call:
+    inputs:
+      ref:
+        description: Branch or SHA to test. Empty tests the ref that triggered the caller.
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -16,6 +21,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
 
       # There is no licensed Adobe Commerce or Mage-OS image to prove the
       # refusal against, so this is what stops the conflicts being deleted.
@@ -58,6 +65,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
 
       # Retried only when the failure names a network problem. A blanket retry
       # would run a genuinely flaky patch three times and report the run that
@@ -116,6 +125,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: Upgrade from the newest release
         run: bash tests/upgrade.sh "${{ matrix.magento_version }}"

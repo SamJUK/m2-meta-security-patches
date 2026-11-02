@@ -1,0 +1,163 @@
+# Copyright (c) 2026 Sam James. Licensed under the Open Software License version 3.0.
+# SPDX-License-Identifier: OSL-3.0
+
+name: Adobe patch sync
+
+# Nightly, and by hand on Adobe's patch day. Checks every patch file against
+# Adobe's registry, then pulls any new month into a pull request and runs the
+# full test matrix on it. The same steps by hand, or by an agent: MAINTAINING.md
+
+on:
+  schedule:
+    - cron: '23 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# GitHub's default bash has no pipefail, so `script | tee` would hide a crash.
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: adobe-sync
+
+env:
+  BRANCH: bot/adobe-patches
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Test the ingest script
+        run: python3 -I -m unittest discover -s tests -p 'test_*.py'
+
+      - name: Check every patch file against Adobe's registry
+        run: bash bin/check-patch-hashes.sh
+
+  # Only on a tree that passed: never build a new month on a tampered one.
+  sync:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      sha: ${{ steps.pr.outputs.sha }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Pull new months from Adobe's registry
+        run: python3 -I bin/ingest-adobe-patches.py | tee report.json
+
+      - name: List decisions not yet made
+        run: |
+          jq -r --rawfile ack .github/adobe-sync-acknowledged '
+            ($ack | split("\n") | map(sub("#.*"; "") | gsub("^\\s+|\\s+$"; "")) | map(select(. != ""))) as $known
+            | (.decisions + (.malformed_registry_entries | map("Malformed registry entry: \(.)")))[]
+            | select(. as $d | $known | all(. as $k | $d | startswith($k) | not))
+          ' report.json > decisions.txt
+          {
+            echo "## Added"
+            jq -r '.added[] | "- \(.line) \(.id) (`\(.registry_id)`)"' report.json
+            echo "## Needs a decision"
+            sed 's/^/- /' decisions.txt
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # An open pull request is left alone: it may carry changelog, docs and
+      # manifest edits by now, so only the patch files this run added are
+      # compared. With none open, the branch is rebuilt from this run,
+      # whatever an earlier merged or failed run left on it.
+      - name: Open a pull request
+        id: pr
+        run: |
+          git add patches/
+          if git diff --cached --quiet; then
+            echo "Nothing new from Adobe."
+            exit 0
+          fi
+
+          if [ "$(gh pr list --head "$BRANCH" --state open --json number --jq length)" != 0 ]; then
+            git fetch -q origin "$BRANCH"
+            mapfile -t added < <(git diff --cached --name-only --diff-filter=A -- 'patches/*.patch')
+            if [ ${#added[@]} -eq 0 ] || git diff --cached --quiet FETCH_HEAD -- "${added[@]}"; then
+              echo "The open $BRANCH pull request already holds these files."
+              exit 0
+            fi
+            echo "::error::Adobe has published more, or changed a file, since the open $BRANCH pull request. See \"The sync stops\" in MAINTAINING.md."
+            exit 1
+          fi
+
+          months=$(jq -r '[.added[].id] | unique | join(", ")' report.json)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$BRANCH"
+          git commit -q -m "feat: add Adobe's $months isolated security patches (CE)" \
+            -m "$(jq -r '.added[] | "- \(.line): \(.registry_id), sha256 \(.sha256)"' report.json)"
+          git push -q --force origin "$BRANCH"
+
+          {
+            echo "Adobe's $months isolated patches, pulled from the [patch registry](https://repo.magento.com/patch/patch-registry.json) by the nightly sync. Every file matches the registry's sha256."
+            echo
+            echo "| Line | Registry id | Released | CVEs | Rewrites earlier months | Overlaps hotfixes | Root or vendor/bin files |"
+            echo "|---|---|---|---|---|---|---|"
+            jq -r '.added[] | "| \(.line) | `\(.registry_id)` | \(.released) | \(.cves) | \(.rewrites_earlier_months | join(", ")) | \(.overlaps_emergency_patches | join(", ")) | \(.root_or_vendor_bin | join(", ")) |"' report.json
+            if [ -s decisions.txt ]; then
+              echo
+              echo "Needs a decision:"
+              echo
+              sed 's/^/- /' decisions.txt
+            fi
+            echo
+            echo "Before merging, following [MAINTAINING.md](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/master/MAINTAINING.md):"
+            echo
+            echo "- [ ] Any overlap with a hotfix: the upgrade tests below are green"
+            echo "- [ ] \`docs/patches.md\` table, and the README coverage table if a line moved"
+            echo "- [ ] \`CHANGELOG.md\` under \`## Unreleased\`"
+            echo
+            echo "Tests: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          } > body.md
+          gh pr create --base master --head "$BRANCH" --title "feat: add Adobe's $months isolated security patches (CE)" --body-file body.md
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Fail on decisions not yet made
+        run: |
+          if [ -s decisions.txt ]; then
+            echo "::error::Adobe's registry needs a decision (see Decisions in MAINTAINING.md). Once made, add the start of its message to .github/adobe-sync-acknowledged."
+            sed 's/^/::error::/' decisions.txt
+            exit 1
+          fi
+
+  # A pull request opened with GITHUB_TOKEN starts no workflows, so the matrix
+  # runs here, on the commit just pushed.
+  test:
+    needs: sync
+    if: ${{ !cancelled() && needs.sync.outputs.sha != '' }}
+    uses: ./.github/workflows/_test.yml
+    with:
+      ref: ${{ needs.sync.outputs.sha }}
+
+  report:
+    needs: [sync, test]
+    if: ${{ !cancelled() && needs.sync.outputs.sha != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RESULT: ${{ needs.test.result }}
+    steps:
+      - name: Post the test result on the pull request
+        run: |
+          gh pr comment "$BRANCH" --repo "$GITHUB_REPOSITORY" \
+            --body "Test matrix: **$RESULT**. ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"

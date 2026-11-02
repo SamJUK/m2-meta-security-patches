@@ -1,0 +1,7 @@
+# Registry decisions already made. The nightly sync ignores a decision whose
+# message starts with any line below. Copy the start of the message: usually
+# the registry id, `Out-of-band VULN-12345 (` for a hotfix (the bracket stops it
+# matching VULN-123456). Delete a line to hear about it again.
+
+# 2.4.6-p15 October: gated to Commerce from release, so not shipped (13th October 2026).
+246p15-2026-10-001-CE

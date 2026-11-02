@@ -32,7 +32,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Test the ingest script
         run: python3 -I -m unittest discover -s tests -p 'test_*.py'
@@ -54,7 +54,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Pull new months from Adobe's registry
         run: python3 -I bin/ingest-adobe-patches.py | tee report.json

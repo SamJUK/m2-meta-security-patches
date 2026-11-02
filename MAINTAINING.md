@@ -78,7 +78,7 @@ bash tests/upgrade.sh <version>                                    # newest rele
 INSTALLER=../magento-patch-installer bash tests/upgrade.sh <version>
 ```
 
-A failure is a finding. Report it with the output. Do not change patches or tests to make it pass. CI runs the full matrix (the sync workflow on its own pull request, the `run-tests` label on any other), so the older patch levels in `tests/matrix.json` need not be run locally.
+A failure is a finding. Report it with the output. Do not change patches or tests to make it pass. CI runs the full matrix on every pull request (the sync workflow runs it for its own, which GitHub would not otherwise test), so the older patch levels in `tests/matrix.json` need not be run locally.
 
 ## 4. Document
 
@@ -102,7 +102,7 @@ Then report, briefly:
 2. What was added, and what was not and why.
 3. Test results per version, with the failing output for anything red.
 4. Decisions for the maintainer.
-5. `Left for you:` review the staged diff, commit, then either push to the sync's pull request or raise one and add the `run-tests` label, then release after merge (below).
+5. `Left for you:` review the staged diff, commit, then either push to the sync's pull request or raise one, then release after merge (below).
 
 ## Releasing
 

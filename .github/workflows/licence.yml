@@ -19,6 +19,6 @@ jobs:
 
       - name: Every source file carries the OSL-3.0 header
         run: |
-          missing=$(git ls-files -z -- '*.sh' \
+          missing=$(git ls-files -z -- '*.sh' '*.py' \
             | xargs -0 -r grep -L 'SPDX-License-Identifier: OSL-3.0' || true)
           [ -z "$missing" ] || { printf '::error::Missing the OSL-3.0 header:\n%s\n' "$missing"; exit 1; }

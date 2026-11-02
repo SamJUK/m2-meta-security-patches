@@ -1,0 +1,24 @@
+# Every source file carries the OSL-3.0 header, so the licence travels with any
+# file lifted out of the repo.
+name: Licence
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  headers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Every source file carries the OSL-3.0 header
+        run: |
+          missing=$(git ls-files -z -- '*.sh' \
+            | xargs -0 -r grep -L 'SPDX-License-Identifier: OSL-3.0' || true)
+          [ -z "$missing" ] || { printf '::error::Missing the OSL-3.0 header:\n%s\n' "$missing"; exit 1; }

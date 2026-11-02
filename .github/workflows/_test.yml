@@ -3,6 +3,9 @@ name: Reusable Test Workflow
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   generate-matrix:
     runs-on: ubuntu-latest
@@ -12,7 +15,14 @@ jobs:
       lines: ${{ steps.set-lines.outputs.lines }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # There is no licensed Adobe Commerce or Mage-OS image to prove the
+      # refusal against, so this is what stops the conflicts being deleted.
+      - name: Adobe Commerce, B2B and Mage-OS are refused
+        run: |
+          jq -e '.conflict | has("magento/product-enterprise-edition") and has("magento/product-b2b-edition") and has("mage-os/framework")' composer.json \
+            || { echo "::error::composer.json no longer conflicts with every edition these patches do not cover"; exit 1; }
 
       - name: Generate test matrix
         id: set-matrix
@@ -29,7 +39,7 @@ jobs:
               php_version: .value
             }
           ]')
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 
       # One per isolated base line: the versions a monthly patch lands on.
       - name: List the isolated lines
@@ -47,7 +57,7 @@ jobs:
     name: Test ${{ matrix.package }}:${{ matrix.magento_version }}-${{ matrix.php_version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Retried only when the failure names a network problem. A blanket retry
       # would run a genuinely flaky patch three times and report the run that
@@ -67,7 +77,9 @@ jobs:
                 && composer config --no-plugins allow-plugins.samjuk/magento-patch-installer true \
                 && composer require samjuk/m2-meta-security-patches:@dev --no-interaction -W \
                 && composer magento-patches:status -v \
-                && composer magento-patches:verify" 2>&1)
+                && composer magento-patches:verify \
+                && { composer magento-patches:list --json | php -r 'exit(count(json_decode(stream_get_contents(STDIN), true)[\"patches\"] ?? []) > 0 ? 0 : 1);' \
+                  || { echo 'no patches declared: an include path is wrong, and verify exits 0 on an empty set'; exit 1; }; }" 2>&1)
             STATUS=$?
             set -e
 
@@ -103,7 +115,7 @@ jobs:
     name: Upgrade ${{ matrix.magento_version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Upgrade from the newest release
         run: bash tests/upgrade.sh "${{ matrix.magento_version }}"
@@ -114,11 +126,15 @@ jobs:
     timeout-minutes: 15
     if: always()
     steps:
+      # Success only. A failed generate-matrix leaves both jobs skipped, which
+      # passed the old `== failure` check, as did a cancelled run.
       - name: Check test results
         run: |
-          if [ "${{ needs.test.result }}" == "failure" ] || [ "${{ needs.upgrade.result }}" == "failure" ]; then
-            echo "❌ Some tests failed"
+          if [ "$TEST" != success ] || [ "$UPGRADE" != success ]; then
+            echo "❌ test: $TEST, upgrade: $UPGRADE"
             exit 1
-          else
-            echo "✅ All tests passed"
           fi
+          echo "✅ All tests passed"
+        env:
+          TEST: ${{ needs.test.result }}
+          UPGRADE: ${{ needs.upgrade.result }}

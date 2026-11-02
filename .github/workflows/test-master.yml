@@ -15,6 +15,9 @@ on:
       - '.claude/**'
       - '.github/dependabot.yml'
 
+permissions:
+  contents: read
+
 jobs:
   run-tests:
     uses: ./.github/workflows/_test.yml

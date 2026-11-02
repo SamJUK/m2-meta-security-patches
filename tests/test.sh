@@ -45,7 +45,7 @@ done
 check_edition_scope() {
     local missing=""
 
-    for pkg in magento/product-enterprise-edition magento/product-b2b-edition; do
+    for pkg in magento/product-enterprise-edition magento/product-b2b-edition mage-os/framework; do
         php -r '
             $j = json_decode(file_get_contents("composer.json"), true);
             exit(isset($j["conflict"][$argv[1]]) ? 0 : 1);
@@ -59,7 +59,7 @@ check_edition_scope() {
         exit 1
     fi
 
-    echo -e "✅ ${CLR_GREEN}Edition scope: Adobe Commerce and B2B are refused at resolution${CLR_RESET}"
+    echo -e "✅ ${CLR_GREEN}Edition scope: Adobe Commerce, B2B and Mage-OS are refused at resolution${CLR_RESET}"
 }
 
 check_edition_scope
